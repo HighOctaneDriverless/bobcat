@@ -33,6 +33,8 @@ class Ackermann():
         # init subscriber
         self.sub_steering = rospy.Subscriber("/mybot/ackermann_steer/command", Float64, self.callback_steering)
         self.sub_speed = rospy.Subscriber("/mybot/ackermann_speed/command", Float64, self.callback_speed)
+        #perhaps important. has to be checked
+        #rospy.spin()
 
     def publish(self):
         self.pub_acc_left.publish(self.speed)
