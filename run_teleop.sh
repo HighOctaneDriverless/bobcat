@@ -1,2 +1,2 @@
 #!/bin/bash
-roslaunch mybot_navigation mybot_teleop.launch
+roslaunch bobcat_navigation bobcat_teleop.launch

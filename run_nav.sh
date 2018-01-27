@@ -1,3 +1,3 @@
 #!/bin/bash
 
-roslaunch mybot_navigation amcl_demo.launch
+roslaunch bobcat_navigation amcl_demo.launch

@@ -72,10 +72,10 @@ Because the recent branch is not Master (but "branch"):
 
 
 B) Start simulator:
-$ roslaunch mybot_gazebo mybot_world.launch
+$ roslaunch bobcat_gazebo bobcat_world.launch
 
 C) Start Controller:
-$ roslaunch mybot_control mybot_control.launch
+$ roslaunch bobcat_control bobcat_control.launch
 
 D) Publish messages on certain Topic (this is the "easy" way using the RQT tool; alternatively in Terminal)
 	- $ rosrun rqt_gui rqt_gui
@@ -83,7 +83,7 @@ D) Publish messages on certain Topic (this is the "easy" way using the RQT tool;
 	- in Menu-Bar: "Plug-Ins" --> "Topics" --> "Message Publisher"
 	- in Message Publisher:
 		- Topic: */command
-			(choose e.g. /mybot/left_steering_hinge_position_controller/command)
+			(choose e.g. /bobcat/left_steering_hinge_position_controller/command)
 		- Type: [don't change]
 		- Frequ.: 100 Hz
 			--> add (green plus)

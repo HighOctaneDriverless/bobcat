@@ -1,4 +1,4 @@
 #!/bin/bash
 
-#roslaunch mybot_description mybot_rviz.launch
-roslaunch mybot_description mybot_rviz_amcl.launch 
+#roslaunch bobcat_description bobcat_rviz.launch
+roslaunch bobcat_description bobcat_rviz_amcl.launch 
