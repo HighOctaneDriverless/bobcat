@@ -1,11 +1,20 @@
 #!/usr/bin/env python
 
+import rospy
+from std_msgs.msg import Float64
+
 class Ackermann():
     def __init__(self):
         #acceleration | speed
         self.speed = 0.0
         #value between -1.0 and 1.0 | straight 0.0
         self.steering = 0.0
+        self.steering_left = 0.0
+        self.steering_right = 0.0
+
+        #CONSTANTS from model
+        self.L = 2.0   #Radstand
+        self.Ba = 1.0  #Achsschenkelbolzenabstand
 
         #init ros_node
         rospy.init_node('ackermann_control', anonymous=True)
@@ -23,11 +32,22 @@ class Ackermann():
     def callback_speed(self, data):
         self.set_speed(data)
 
-    def set_speed(self,new_speed):
+    def set_speed(self, new_speed):
         self.speed = new_speed
 
-    def set_steering(self,new_steering):
+    def set_steering(self, new_steering):
         self.steering = new_steering
+        #get steering of the wheels
+        #TODO get cotan and values of steering
+        #steer_dif = (self.Ba/self.L)/2.0
+        steer_dif = 0.0
+        if self.steering > 0:
+            self.steering_right += steer_dif
+            self.steering_left -= steer_dif
+        else:
+            self.steering_right -= steer_dif
+            self.steering_left += steer_dif
+
 
     def subscribe(self):
         # init subscriber
@@ -39,12 +59,13 @@ class Ackermann():
     def publish(self):
         self.pub_acc_left.publish(self.speed)
         self.pub_acc_right.publish(self.speed)
-        self.pub_steering_left.publish(self.steering)
-        self.pub_steering_right.publish(self.steering)
+        self.pub_steering_left.publish(self.steering_left)
+        self.pub_steering_right.publish(self.steering_right)
 
 
 def main():
     ackerm = Ackermann()
+    rospy.loginfo("Ackermann started")
     rate = rospy.Rate(100) # 100hz
     while not rospy.is_shutdown():
         ackerm.subscribe()
