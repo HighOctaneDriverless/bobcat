@@ -36,17 +36,18 @@ class Ackermann():
         self.speed = new_speed
 
     def set_steering(self, new_steering):
+
         self.steering = new_steering
         #get steering of the wheels
         #TODO get cotan and values of steering
         #steer_dif = (self.Ba/self.L)/2.0
-        steer_dif = 0.0
-        if self.steering > 0:
-            self.steering_right += steer_dif
-            self.steering_left -= steer_dif
-        else:
-            self.steering_right -= steer_dif
-            self.steering_left += steer_dif
+        # steer_dif = 0.0
+        # if self.steering > 0:
+        #     self.steering_right += steer_dif
+        #     self.steering_left -= steer_dif
+        # else:
+        #     self.steering_right -= steer_dif
+        #     self.steering_left += steer_dif
 
 
     def subscribe(self):
@@ -59,8 +60,8 @@ class Ackermann():
     def publish(self):
         self.pub_acc_left.publish(self.speed)
         self.pub_acc_right.publish(self.speed)
-        self.pub_steering_left.publish(self.steering_left)
-        self.pub_steering_right.publish(self.steering_right)
+        self.pub_steering_left.publish(self.steering)
+        self.pub_steering_right.publish(self.steering)
 
 
 def main():
