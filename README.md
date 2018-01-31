@@ -1,13 +1,5 @@
-<<<<<<< HEAD
-=======
 Getting Started!
 
-2018_01_26_2330
-Benjamin
-
-------------------------------------
-
->>>>>>> acef0cd92c3ba07cf256d18e00762ee1c50deb05
 INSTALLATION:
 
 1)
