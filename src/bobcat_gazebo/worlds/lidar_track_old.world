@@ -550,6 +550,52 @@
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
+      <model name='bobcat'>
+        <pose frame=''>1.61823 -0.281616 7.7e-05 -0.000654 9.9e-05 0.027591</pose>
+        <scale>1 1 1</scale>
+        <link name='base_link'>
+          <pose frame=''>1.61823 -0.281616 7.7e-05 -0.000654 9.9e-05 0.027591</pose>
+          <velocity>-0.004834 -0.001618 -0.005076 0.022299 -0.00602 -0.013143</velocity>
+          <acceleration>-0.740825 0.615839 3.38799 2.51356 -0.030986 3.08663</acceleration>
+          <wrench>-3.05963 2.54344 13.9925 0 -0 0</wrench>
+        </link>
+        <link name='left_front_wheel'>
+          <pose frame=''>1.9403 -0.172803 0.050116 -1.57862 -0.602463 2.6806</pose>
+          <velocity>-0.004227 -0.007205 -5e-05 0.143599 -0.069031 -0.010485</velocity>
+          <acceleration>-2.36474 2.65774 3.80519 -0.361727 0.13362 1.68077</acceleration>
+          <wrench>-0.805312 0.905094 1.29586 0 -0 0</wrench>
+        </link>
+        <link name='left_rear_wheel'>
+          <pose frame=''>1.61548 -0.181671 0.05009 -1.56659 -0.516657 -3.11612</pose>
+          <velocity>-0.004727 -0.011129 -0.009268 0.205468 -0.075534 -0.012338</velocity>
+          <acceleration>-0.105591 -0.301849 0.043123 -0.731325 -1.20554 1.02585</acceleration>
+          <wrench>-0.035959 -0.102795 0.014685 0 -0 0</wrench>
+        </link>
+        <link name='left_steering_hinge'>
+          <pose frame=''>1.94032 -0.172742 0.050007 1.54876 1.55477 1.08282</pose>
+          <velocity>-0.002528 -0.009355 0.012135 -0.082683 -0.110971 -0.029431</velocity>
+          <acceleration>-2.7138 1.45692 6.61339 -0.864388 1.45524 0.595295</acceleration>
+          <wrench>-0.27138 0.145692 0.661339 0 -0 0</wrench>
+        </link>
+        <link name='right_front_wheel'>
+          <pose frame=''>1.94592 -0.372487 0.050295 1.58489 -1.38755 -0.48675</pose>
+          <velocity>-0.003687 -0.011773 0.026914 0.231982 -0.072554 0.000609</velocity>
+          <acceleration>-1.80767 2.17789 9.08812 1.40673 1.49704 1.78443</acceleration>
+          <wrench>-0.6156 0.741682 3.09496 0 -0 0</wrench>
+        </link>
+        <link name='right_rear_wheel'>
+          <pose frame=''>1.62099 -0.381452 0.050254 1.58729 -1.26189 0.011827</pose>
+          <velocity>-0.00378 -0.012986 0.012685 0.281586 -0.104637 -0.019986</velocity>
+          <acceleration>0.530608 1.14788 -0.041751 0.054506 0.729291 2.82986</acceleration>
+          <wrench>0.180698 0.390909 -0.014218 0 -0 0</wrench>
+        </link>
+        <link name='right_steering_hinge'>
+          <pose frame=''>1.94587 -0.372594 0.050083 -1.21271 1.56995 -1.68491</pose>
+          <velocity>-0.000964 -0.014855 0.014382 0.011834 -0.035923 -0.014225</velocity>
+          <acceleration>-1.5696 1.92255 7.99961 2.92992 0.846413 3.02226</acceleration>
+          <wrench>-0.15696 0.192255 0.799961 0 -0 0</wrench>
+        </link>
+      </model>
       <light name='sun'>
         <pose frame=''>0 0 10 0 -0 0</pose>
       </light>
