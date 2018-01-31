@@ -19,12 +19,12 @@ class Ackermann():
         #init ros_node
         rospy.init_node('ackermann_control', anonymous=True)
         #init publisher
-        self.pub_acc_left = rospy.Publisher("/bobcat/left_rear_wheel_effort_controller/command", Float64, queue_size=10)
-        self.pub_acc_right = rospy.Publisher("/bobcat/right_rear_wheel_effort_controller/command", Float64, queue_size=10)
+        self.pub_acc_left = rospy.Publisher("/bobcat/left_rear_wheel_effort_controller/command", Float64, queue_size=1)
+        self.pub_acc_right = rospy.Publisher("/bobcat/right_rear_wheel_effort_controller/command", Float64, queue_size=1)
         self.pub_steering_left = rospy.Publisher("/bobcat/left_steering_hinge_position_controller/command", Float64,
-                                            queue_size=10)
+                                            queue_size=1)
         self.pub_steering_right = rospy.Publisher("/bobcat/right_steering_hinge_position_controller/command", Float64,
-                                             queue_size=10)
+                                             queue_size=1)
 
     def callback_steering(self, data):
         self.set_steering(data)
@@ -52,8 +52,8 @@ class Ackermann():
 
     def subscribe(self):
         # init subscriber
-        self.sub_steering = rospy.Subscriber("/bobcat/ackermann_steer/command", Float64, self.callback_steering)
-        self.sub_speed = rospy.Subscriber("/bobcat/ackermann_speed/command", Float64, self.callback_speed)
+        rospy.Subscriber("/bobcat/ackermann_steer/command", Float64, self.callback_steering)
+        rospy.Subscriber("/bobcat/ackermann_speed/command", Float64, self.callback_speed)
         #perhaps important. has to be checked
         #rospy.spin()
 
@@ -62,12 +62,13 @@ class Ackermann():
         self.pub_acc_right.publish(self.speed)
         self.pub_steering_left.publish(self.steering)
         self.pub_steering_right.publish(self.steering)
+        rospy.loginfo("Speed: "+str(self.speed)+"Steer: "+str(self.steering))
 
 
 def main():
     ackerm = Ackermann()
     rospy.loginfo("Ackermann started")
-    rate = rospy.Rate(100) # 100hz
+    rate = rospy.Rate(10) # 100hz
     while not rospy.is_shutdown():
         ackerm.subscribe()
         ackerm.publish()
