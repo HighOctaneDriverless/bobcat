@@ -1,0 +1,41 @@
+bobcat:
+  # Publish all joint states -----------------------------------
+  joint_state_controller:
+    type: joint_state_controller/JointStateController
+    publish_rate: 50  
+
+  # Velocity Controllers ---------------------------------------
+  left_rear_wheel_effort_controller:
+    type: effort_controllers/JointEffortController
+    joint: left_rear_wheel_joint
+    pid: {p: 1.0, i: 0.0, d: 0.0, i_clamp: 0.0}
+  right_rear_wheel_effort_controller:
+    type: effort_controllers/JointEffortController
+    joint: right_rear_wheel_joint
+    pid: {p: 1.0, i: 0.0, d: 0.0, i_clamp: 0.0}
+  left_front_wheel_effort_controller:
+    type: effort_controllers/JointEffortController
+    joint: left_front_wheel_joint
+    pid: {p: 1.0, i: 0.0, d: 0.0, i_clamp: 100.0}
+  right_front_wheel_effort_controller:
+    type: effort_controllers/JointEffortController
+    joint: right_front_wheel_joint
+    pid: {p: 1.0, i: 0.0, d: 0.0, i_clamp: 100.0}
+
+
+  # Position Controllers ---------------------------------------
+  left_steering_hinge_position_controller:
+    joint: left_steering_hinge_joint
+    type: effort_controllers/JointPositionController
+<<<<<<< HEAD:src/mybot_control/config/mybot_control.yaml
+
+=======
+>>>>>>> acef0cd92c3ba07cf256d18e00762ee1c50deb05:src/bobcat_control/config/bobcat_control.yaml
+    pid: {p: 0.05, i: 0.0, d: 0.05}
+
+  right_steering_hinge_position_controller:
+    joint: right_steering_hinge_joint
+    type: effort_controllers/JointPositionController
+    pid: {p: 0.05, i: 0.0, d: 0.05}
+
+
