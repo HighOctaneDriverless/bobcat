@@ -137,10 +137,6 @@
   <transmission name="${name}_transmission" type="SimpleTransmission">
     <type>transmission_interface/SimpleTransmission</type>
     <joint name="${name}_joint">
-<<<<<<< HEAD:src/mybot_description/urdf/macros.xacro
-       <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-=======
->>>>>>> acef0cd92c3ba07cf256d18e00762ee1c50deb05:src/bobcat_description/urdf/macros.xacro
       <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
     </joint>
     <actuator name="${name}_motor">

@@ -19,11 +19,11 @@ class Ackermann():
         #init ros_node
         rospy.init_node('ackermann_control', anonymous=True)
         #init publisher
-        self.pub_acc_left = rospy.Publisher("/mybot/left_rear_wheel_effort_controller/command", Float64, queue_size=10)
-        self.pub_acc_right = rospy.Publisher("/mybot/right_rear_wheel_effort_controller/command", Float64, queue_size=10)
-        self.pub_steering_left = rospy.Publisher("/mybot/left_steering_hinge_position_controller/command", Float64,
+        self.pub_acc_left = rospy.Publisher("/bobcat/left_rear_wheel_effort_controller/command", Float64, queue_size=10)
+        self.pub_acc_right = rospy.Publisher("/bobcat/right_rear_wheel_effort_controller/command", Float64, queue_size=10)
+        self.pub_steering_left = rospy.Publisher("/bobcat/left_steering_hinge_position_controller/command", Float64,
                                             queue_size=10)
-        self.pub_steering_right = rospy.Publisher("/mybot/right_steering_hinge_position_controller/command", Float64,
+        self.pub_steering_right = rospy.Publisher("/bobcat/right_steering_hinge_position_controller/command", Float64,
                                              queue_size=10)
 
     def callback_steering(self, data):
@@ -52,8 +52,8 @@ class Ackermann():
 
     def subscribe(self):
         # init subscriber
-        self.sub_steering = rospy.Subscriber("/mybot/ackermann_steer/command", Float64, self.callback_steering)
-        self.sub_speed = rospy.Subscriber("/mybot/ackermann_speed/command", Float64, self.callback_speed)
+        self.sub_steering = rospy.Subscriber("/bobcat/ackermann_steer/command", Float64, self.callback_steering)
+        self.sub_speed = rospy.Subscriber("/bobcat/ackermann_speed/command", Float64, self.callback_speed)
         #perhaps important. has to be checked
         #rospy.spin()
 
