@@ -27,10 +27,6 @@ bobcat:
   left_steering_hinge_position_controller:
     joint: left_steering_hinge_joint
     type: effort_controllers/JointPositionController
-<<<<<<< HEAD:src/mybot_control/config/mybot_control.yaml
-
-=======
->>>>>>> acef0cd92c3ba07cf256d18e00762ee1c50deb05:src/bobcat_control/config/bobcat_control.yaml
     pid: {p: 0.05, i: 0.0, d: 0.05}
 
   right_steering_hinge_position_controller:

@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>mybot_ackermann</name>
+  <name>bobcat_ackermann</name>
   <version>0.0.0</version>
-  <description>The mybot_ackermann package</description>
+  <description>The bobcat_ackermann package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->
