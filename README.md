@@ -73,31 +73,9 @@ Because the recent branch is not Master (but "branch"):
 ~/catkin_ws $ catkin_make
 
 
-<<<<<<< HEAD
 B) Start:
 $ cd ~/catkin_ws/src/bobcat/
 ./run_track_ackermann.sh
-=======
-
-B) Start simulator:
-$ roslaunch bobcat_gazebo bobcat_world.launch
-
-C) Start Controller:
-$ roslaunch bobcat_control bobcat_control.launch
-
-D) Publish messages on certain Topic (this is the "easy" way using the RQT tool; alternatively in Terminal)
-	- $ rosrun rqt_gui rqt_gui
-	- blanc window should open
-	- in Menu-Bar: "Plug-Ins" --> "Topics" --> "Message Publisher"
-	- in Message Publisher:
-		- Topic: */command
-			(choose e.g. /bobcat/left_steering_hinge_position_controller/command)
-		- Type: [don't change]
-		- Frequ.: 100 Hz
-			--> add (green plus)
-		- Activate checkbox, open dropdown, edit expression (e.g. 0.2)
-
-
 
 --------------------------------------------------------------------------
 
@@ -108,4 +86,3 @@ If Gazebo broke and you need to restart it you might need to terminate all runni
 $ killall gzclient
 $ killall gzserver
 $ kill roscore
->>>>>>> acef0cd92c3ba07cf256d18e00762ee1c50deb05
