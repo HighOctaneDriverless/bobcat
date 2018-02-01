@@ -28,21 +28,24 @@ class PFWL():
 
     def callback(self,scan):
         self.scan = scan
-        self.left_dist = scan.ranges[1080/5*3]
-        if self.left_dist == float('inf'):
-            self.left_dist = 10.0
-        elif self.left_dist < 0.1:
-            self.left_dist = 0.1
-        self.middle_dist = scan.ranges[1080/2]
-        if self.middle_dist == float('inf'):
-            self.middle_dist = 10.0
-        elif self.middle_dist < 1.0:
-            self.middle_dist = 1.0
-        self.right_dist = scan.ranges[1080/5*2]
-        if self.right_dist == float('inf'):
-            self.right_dist = 10.0
-        elif self.right_dist < 0.1:
-            self.right_dist = 0.1
+
+        #OLD CODE
+        # self.left_dist = scan.ranges[1080/5*3]
+        # if self.left_dist == float('inf'):
+        #     self.left_dist = 10.0
+        # elif self.left_dist < 0.1:
+        #     self.left_dist = 0.1
+        # self.middle_dist = scan.ranges[1080/2]
+        # if self.middle_dist == float('inf'):
+        #     self.middle_dist = 10.0
+        # elif self.middle_dist < 1.0:
+        #     self.middle_dist = 1.0
+        # self.right_dist = scan.ranges[1080/5*2]
+        # if self.right_dist == float('inf'):
+        #     self.right_dist = 10.0
+        # elif self.right_dist < 0.1:
+        #     self.right_dist = 0.1
+
         #rospy.loginfo((len(scan.ranges), min(scan.ranges)))
         #rospy.loginfo("left "+str(scan.ranges[1080/2])+" array number: "+str(1081/4))
         rospy.loginfo("left: "+str(self.left_dist)+" right: "+ str(self.right_dist) + "s_L: " + str(1080/5*2)+ " s_R: "+str(1080/5*3))
