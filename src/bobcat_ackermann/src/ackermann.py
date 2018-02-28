@@ -3,10 +3,12 @@
 import rospy
 from std_msgs.msg import Float64
 from gazebo_msgs.msg import ModelStates
+from sensor_msgs.msg import Joy
 import math
 
 class Ackermann():
     def __init__(self):
+	self.subscribe()
         #acceleration | speed
         self.desired_speed = Float64(0.0)
 	self.measured_speed = 0.0
@@ -45,8 +47,14 @@ class Ackermann():
 	else:
 		self.measured_speed = - math.sqrt(x**2 + y**2) 
 
+    def callback_controller(self,data):
+	self.set_speed(data.axes[1]/2)
+        self.set_steering(data.axes[0])
+        rospy.loginfo("Joystick speed "+ str(data.axes[1]/2))
+
+
     def set_speed(self, new_speed):
-        self.desired_speed = new_speed
+        self.desired_speed.data = new_speed
 
     def set_steering(self, new_steering):
         self.steering = new_steering
@@ -56,11 +64,12 @@ class Ackermann():
         rospy.Subscriber("/bobcat/ackermann_steer/command", Float64, self.callback_steering)
         rospy.Subscriber("/bobcat/ackermann_speed/command", Float64, self.callback_speed)
 	rospy.Subscriber("/gazebo/model_states", ModelStates, self.callback_state)
+        rospy.Subscriber("joy", Joy, self.callback_controller)
         #perhaps important. has to be checked
         #rospy.spin()
 
     def pid(self):
-	p = 3 # 3 as initial guess :D i and d missing for now needs to be determined how much that is needed
+	p = 2 # 3 as initial guess :D i and d missing for now needs to be determined how much that is needed
 	print "desired_speed : " + repr(self.desired_speed) + "   measured_speed: " + repr(self.measured_speed)
 	print "measured_speed: " 
 	print type(self.measured_speed)
@@ -82,9 +91,9 @@ class Ackermann():
 def main():
     ackerm = Ackermann()
     rospy.loginfo("Ackermann started")
-    rate = rospy.Rate(10) # 100hz
+    rate = rospy.Rate(100) # 
     while not rospy.is_shutdown():
-        ackerm.subscribe()
+        
         ackerm.publish()
         rate.sleep()
 
