@@ -33,8 +33,8 @@ class Ackermann():
         rospy.Subscriber("joy", Joy, self.callback_controller)
  
     def publish(self):
-	self.pub_acc.publish(int(self.motor*100))
-        self.pub_steering.publish((self.steering*100))
+	self.pub_acc.publish(Int8(self.motor*100))
+        self.pub_steering.publish(Int8(self.steering*100))
         rospy.loginfo("Motor: "+str(int(self.motor*100))+"Steering: "+str(int(self.steering*100)))
 
 
