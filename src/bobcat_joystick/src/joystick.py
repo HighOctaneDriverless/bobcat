@@ -2,20 +2,20 @@
 
 import rospy
 from sensor_msgs.msg import Joy
-from std_msgs.msg import Int8
+from std_msgs.msg import Float64
 import math
 
 class Ackermann():
     def __init__(self):
 	self.subscribe()
-        self.motor = 0.0     
-        self.steering = 0.0
+        self.speed = 0.0     
+        self.steeringAngle = 0.0
 
         #init ros_node
         rospy.init_node('joystick_control', anonymous=True)
         #init publisher
-        self.pub_acc = rospy.Publisher("motor", Int8, queue_size=1)
-        self.pub_steering = rospy.Publisher("steering", Int8, queue_size=1)
+        self.pub_acc = rospy.Publisher("/bobcat/ackermann_speed/command", Float64, queue_size=1)
+        self.pub_steering = rospy.Publisher("bobcat/ackermann_steer/command", Float64, queue_size=1)
 
     def callback_controller(self,data):
 	self.set_speed(data.axes[1])
@@ -23,19 +23,21 @@ class Ackermann():
         #rospy.loginfo("Joystick speed "+ str(int(self.motor)*100))
 
     def set_speed(self, new_speed):
-        self.motor = new_speed
+        self.speed = new_speed
 
     def set_steering(self, new_steering):
-        self.steering = new_steering
+        self.steeringAngle = new_steering
 
     def subscribe(self):
         # init subscriber
         rospy.Subscriber("joy", Joy, self.callback_controller)
  
     def publish(self):
-	self.pub_acc.publish(Int8(self.motor*100))
-        self.pub_steering.publish(Int8(self.steering*100))
-        rospy.loginfo("Motor: "+str(int(self.motor*100))+"Steering: "+str(int(self.steering*100)))
+	ackermannSpeedOut = self.speed * 10 # outputting 10m/s max equals 36km/h
+	self.pub_acc.publish(Float64(ackermannSpeedOut))
+	ackermannSteerOut = self.steeringAngle * math.pi/2.0
+        self.pub_steering.publish(Float64(ackermannSteerOut))
+        rospy.loginfo("AckermannSpeed: "+str(round(ackermannSpeedOut, 3))+"   AckermannSteeringAngle: "+str(round(ackermannSteerOut, 3)))
 
 
 def main():

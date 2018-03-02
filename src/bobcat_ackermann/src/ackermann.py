@@ -34,10 +34,10 @@ class Ackermann():
                                              queue_size=1)
 
     def callback_steering(self, data):
-        self.set_steering(data)
+        self.set_steering(data.data)
 
     def callback_speed(self, data):
-        self.set_speed(data)
+        self.set_speed(data.data)
 
     def callback_state(self, data):
 	x = data.twist[-1].linear.x
@@ -54,7 +54,7 @@ class Ackermann():
 
 
     def set_speed(self, new_speed):
-        self.desired_speed.data = new_speed
+        self.desired_speed.data = new_speed / 10
 
     def set_steering(self, new_steering):
         self.steering = new_steering
@@ -64,20 +64,24 @@ class Ackermann():
         rospy.Subscriber("/bobcat/ackermann_steer/command", Float64, self.callback_steering)
         rospy.Subscriber("/bobcat/ackermann_speed/command", Float64, self.callback_speed)
 	rospy.Subscriber("/gazebo/model_states", ModelStates, self.callback_state)
-        rospy.Subscriber("joy", Joy, self.callback_controller)
+        #rospy.Subscriber("joy", Joy, self.callback_controller)
         #perhaps important. has to be checked
         #rospy.spin()
 
     def pid(self):
-	p = 2 # 3 as initial guess :D i and d missing for now needs to be determined how much that is needed
-	print "desired_speed : " + repr(self.desired_speed) + "   measured_speed: " + repr(self.measured_speed)
-	print "measured_speed: " 
-	print type(self.measured_speed)
-	print "desired_speed: " 
+	p = 2.0 # 3 as initial guess :D i and d missing for now needs to be determined how much that is needed
+	#print "desired_speed : " + repr(self.desired_speed) + "   measured_speed: " + repr(self.measured_speed)
+	#print "measured_speed: " 
+	#print type(self.measured_speed)
+	#print "desired_speed: " 
 	print type(self.desired_speed.data)
 	diff =  self.desired_speed.data - self.measured_speed
 
 	self.speed_out = diff * p
+	if (self.speed_out > 0.6):
+		self.speed_out = 0.6
+	elif (self.speed_out < -0.6):
+		self.speed_out = -0.6
 
     def publish(self):
 	self.pid()

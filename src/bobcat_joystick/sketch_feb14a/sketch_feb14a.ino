@@ -28,6 +28,7 @@
 #include <ros.h>
 #include <std_msgs/UInt16.h>
 #include <std_msgs/Int8.h>
+#include <std_msgs/Float64.h>
 
 ros::NodeHandle  nh;
 
@@ -36,9 +37,10 @@ Servo motor;
 int input_timeout;
 int max_input_timeout = 100;
 
-void steering_cb( const std_msgs::Int8& cmd_msg){
-  int out = - cmd_msg.data;
-  out = out /2;
+void steering_cb( const std_msgs::Float64& cmd_msg){
+  float tmp = - cmd_msg.data;
+  tmp = tmp * 90/ (3.1416/2.0); 
+  int out = (int) tmp;
   if(out > 90){
     out = 90;
   }else if(out < -90){
@@ -49,11 +51,12 @@ void steering_cb( const std_msgs::Int8& cmd_msg){
   digitalWrite(13, HIGH-digitalRead(13));  //toggle led  
 }
 
-void esc_cb( const std_msgs::Int8& cmd_msg){
-  int output = 0;
+void esc_cb( const std_msgs::Float64& cmd_msg){
+  float tmp = -cmd_msg.data;
+  tmp = tmp*100/10;
+  int output = (int) tmp;
   input_timeout = 0;
-  output = - cmd_msg.data;
-
+  
   if(output >23){
     output = 23;
   }
@@ -66,8 +69,8 @@ void esc_cb( const std_msgs::Int8& cmd_msg){
 }
 
 
-ros::Subscriber<std_msgs::Int8> sub("steering", steering_cb);
-ros::Subscriber<std_msgs::Int8> sub2("motor", esc_cb);
+ros::Subscriber<std_msgs::Float64> sub("/bobcat/ackermann_steer/command", steering_cb);
+ros::Subscriber<std_msgs::Float64> sub2("/bobcat/ackermann_speed/command", esc_cb);
 
 void setup(){
   pinMode(13, OUTPUT);
