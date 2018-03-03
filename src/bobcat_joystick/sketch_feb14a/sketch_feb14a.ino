@@ -69,8 +69,8 @@ void esc_cb( const std_msgs::Float64& cmd_msg){
 }
 
 
-ros::Subscriber<std_msgs::Float64> sub("/bobcat/ackermann_steer/command", steering_cb);
-ros::Subscriber<std_msgs::Float64> sub2("/bobcat/ackermann_speed/command", esc_cb);
+ros::Subscriber<std_msgs::Float64> sub("/bobcat/statemachine_steer/command", steering_cb);
+ros::Subscriber<std_msgs::Float64> sub2("/bobcat/statemachine_speed/command", esc_cb);
 
 void setup(){
   pinMode(13, OUTPUT);

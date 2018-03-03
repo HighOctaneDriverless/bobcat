@@ -24,8 +24,8 @@ class PFWL():
         rospy.init_node('pfwl', anonymous=True)
 
         #init publisher
-        self.ack_speed = rospy.Publisher("/bobcat/ackermann_speed/command", Float64, queue_size=1)
-        self.ack_steer = rospy.Publisher("/bobcat/ackermann_steer/command", Float64, queue_size=1)
+        self.ack_speed = rospy.Publisher("/bobcat/pfwl_speed/command", Float64, queue_size=1)
+        self.ack_steer = rospy.Publisher("/bobcat/pfwl_steer/command", Float64, queue_size=1)
 
         rospy.Subscriber("/scan",LaserScan,self.callback)
 

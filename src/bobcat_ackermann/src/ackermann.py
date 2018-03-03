@@ -61,8 +61,8 @@ class Ackermann():
 
     def subscribe(self):
         # init subscriber
-        rospy.Subscriber("/bobcat/ackermann_steer/command", Float64, self.callback_steering)
-        rospy.Subscriber("/bobcat/ackermann_speed/command", Float64, self.callback_speed)
+        rospy.Subscriber("/bobcat/statemachine_steer/command", Float64, self.callback_steering)
+        rospy.Subscriber("/bobcat/statemachine_speed/command", Float64, self.callback_speed)
         rospy.Subscriber("/gazebo/model_states", ModelStates, self.callback_state)
         #rospy.Subscriber("joy", Joy, self.callback_controller)
         #perhaps important. has to be checked
