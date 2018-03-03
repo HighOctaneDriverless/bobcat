@@ -66,9 +66,6 @@ class PFWL():
         self.set_steering(self.steering)
 
         rospy.loginfo("Winkel (rad): "+str(self.steering))
-        #rospy.loginfo((len(scan.ranges), min(scan.ranges)))
-        #rospy.loginfo("left "+str(scan.ranges[1080/2])+" array number: "+str(1081/4))
-        #rospy.loginfo("left: "+str(self.left_dist)+" right: "+ str(self.right_dist) + "s_L: " + str(1080/5*2)+ " s_R: "+str(1080/5*3))
 
     def set_speed(self, new_speed):
         self.speed = new_speed
