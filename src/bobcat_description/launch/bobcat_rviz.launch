@@ -18,5 +18,5 @@
   <!-- Transform point cloud from depth camera -->
 <!--node pkg="tf" type="static_transform_publisher" name="depth_to_depth" 
 args="0 0 0 0 3.14159 0 /zed_depth/depth/points /zed_depth/depth/points_tf 100" /-->
-
+  <node name="cameraTf" pkg="bobcat_description" type= "cameraTf"/>
 </launch>

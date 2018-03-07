@@ -15,3 +15,4 @@ sleep 3
 x-terminal-emulator -e "rosrun rviz rviz" #--noclose
 sleep 3
 x-terminal-emulator -e "rosrun joy joy_node" #--noclose
+
