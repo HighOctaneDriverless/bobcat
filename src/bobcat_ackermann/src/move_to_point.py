@@ -15,17 +15,17 @@ class MoveToPoint():
         self.startPose = CarPose()
         self.newPose = CarPose()
         
-        self.maxSpeed = 1 #m/s
-        self.kbeta_t = 0.5
-        self.kalpha = 0.8
+        self.maxSpeed = 2 #m/s
+        self.kbeta_t = 1.4
+        self.kalpha = 1.5
         self.moveToPointActive = False
         self.direction = 0
         self.lastRho = 100000
         self.firstCall = True
         
-        self.pubAckermannSpeed = rospy.Publisher("/bobcat/statemachine_speed/command", Float64,
+        self.pubAckermannSpeed = rospy.Publisher("/bobcat/ackermann_speed/command", Float64,
                                             queue_size=1)
-        self.pubAckermannSteer = rospy.Publisher("/bobcat/statemachine_steer/command", Float64,
+        self.pubAckermannSteer = rospy.Publisher("/bobcat/ackermann_steer/command", Float64,
                                              queue_size=1)
     
     def subscribe(self):
@@ -56,30 +56,33 @@ class MoveToPoint():
         tmpStartPose.yaw = self.newPose.yaw
         self.startPose = tmpStartPose
         self.moveToPointActive = True
+        self.firstCall = True
         self.direction = 0
         
-    def callback_goal_pose(self, data):
-        #tfPose = tf.fromMsg(data)
-        print "callback goal pose"
-        pose = CarPose()
-        pose.x = data.position.x
-        pose.y = data.position.y
-        pose.yaw = self.transform_quaternion_euler(data)[2]
-        print pose
-        self.newGoalPose = pose
-        tmpStartPose = CarPose()
-        tmpStartPose.x = self.newPose.x
-        tmpStartPose.y = self.newPose.y
-        tmpStartPose.yaw = self.newPose.yaw
-        self.startPose = tmpStartPose
-        self.moveToPointActive = True
-        self.direction = 0
-        self.lastRho = 100000
+#==============================================================================
+#     def callback_goal_pose(self, data):
+#         #tfPose = tf.fromMsg(data)
+#         print "callback goal pose"
+#         pose = CarPose()
+#         pose.x = data.position.x
+#         pose.y = data.position.y
+#         pose.yaw = self.transform_quaternion_euler(data)[2]
+#         print pose
+#         self.newGoalPose = pose
+#         tmpStartPose = CarPose()
+#         tmpStartPose.x = self.newPose.x
+#         tmpStartPose.y = self.newPose.y
+#         tmpStartPose.yaw = self.newPose.yaw
+#         self.startPose = tmpStartPose
+#         self.moveToPointActive = True
+#         self.direction = 0
+#         self.lastRho = 100000
+#==============================================================================
     
     def move_to_point(self):
+
         tmpNewCarPose = self.newPose
-        
-        
+                
         tmpStartPose = CarPose()
         tmpStartPose.x = self.startPose.x
         tmpStartPose.y = self.startPose.y
@@ -101,14 +104,14 @@ class MoveToPoint():
             tmpPoseDiff.yaw = tmpPoseDiff.yaw + math.pi * 2
         
         #rotate coordinates for local pose
-        ySin = tmpPoseDiff.y * math.sin(tmpStartPose.yaw)
-        yCos = tmpPoseDiff.y * math.cos(tmpStartPose.yaw)
-        xCos = tmpPoseDiff.x * math.cos(tmpStartPose.yaw)
-        xSin = tmpPoseDiff.x * math.sin(tmpStartPose.yaw)
+        ySin = tmpPoseDiff.y * math.sin(tmpPoseDiff.yaw)
+        yCos = tmpPoseDiff.y * math.cos(tmpPoseDiff.yaw)
+        xCos = tmpPoseDiff.x * math.cos(tmpPoseDiff.yaw)
+        xSin = tmpPoseDiff.x * math.sin(tmpPoseDiff.yaw)
         
         tmp1 = ySin + xCos
         tmp2 = xSin + yCos
-        print "local pose  x: " + str(tmp1) + "y: " + str(tmp2)
+        print "local pose  x: " + str(tmp1) + "y: " + str(tmp2) + "yaw: " + str(tmpPoseDiff.yaw * 180/math.pi)
 
         # calculate delta x and delta y
         deltaX = ySin + xCos - self.newGoalPose.x
@@ -120,8 +123,10 @@ class MoveToPoint():
         if(self.firstCall):
             self.firstCall = False
             self.lastRho = rho
-        print "rho : " + str(rho)
-        print "abs lastRho - rho: " + str(abs(self.lastRho - rho))
+#==============================================================================
+#         print "rho : " + str(rho)
+#         print "abs lastRho - rho: " + str(abs(self.lastRho - rho))
+#==============================================================================
         if (abs(self.lastRho - rho) > 0.2):
             self.moveToPointActive = False
             print "missed point"
@@ -130,7 +135,7 @@ class MoveToPoint():
             self.lastRho = rho
 
         
-        speedOut = rho * self.maxSpeed * 2  + 0.2
+        speedOut = rho * self.maxSpeed  + 0.3
         if(speedOut > self.maxSpeed):
             speedOut = self.maxSpeed
         
@@ -172,7 +177,8 @@ class MoveToPoint():
 #         print "speedOut :" + str(speedOut)
 #         
 #==============================================================================
-        if rho < 0.06:          
+        if rho < 0.06:
+            print "hit point"
             self.moveToPointActive = False
             
         return [speedOut, steerOut]

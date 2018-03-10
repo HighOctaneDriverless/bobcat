@@ -84,12 +84,12 @@ class Ackermann():
         #print type(self.desired_speed.data)
         
         diff =  self.desired_speed.data - np.median(self.median_filter)
-        rospy.loginfo("desired_speed "+ str(self.desired_speed.data) + "  measured_speed" + str(np.median(self.median_filter)))
         self.speed_out = diff * p
         if (self.speed_out > 1.2):
             self.speed_out = 1.2
         elif (self.speed_out < -1.2):
             self.speed_out = -1.2
+        rospy.loginfo("desired_speed "+ str(self.desired_speed.data) + "  measured_speed" + str(np.median(self.median_filter)) + "  output: " + str(self.speed_out))
 
     def publish(self):
         self.pid()
@@ -103,7 +103,7 @@ class Ackermann():
 def main():
     ackerm = Ackermann()
     rospy.loginfo("Ackermann started")
-    rate = rospy.Rate(100) # 
+    rate = rospy.Rate(20) # 
     while not rospy.is_shutdown():
 
         ackerm.publish()
