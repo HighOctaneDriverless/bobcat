@@ -14,12 +14,13 @@ class Ackermann():
         #init ros_node
         rospy.init_node('joystick_control', anonymous=True)
         #init publisher
-        self.pub_acc = rospy.Publisher("/bobcat/joy_speed/command", Float64, queue_size=1)
-        self.pub_steering = rospy.Publisher("bobcat/joy_steer/command", Float64, queue_size=1)
+        self.pub_acc = rospy.Publisher("/bobcat/ackermann_speed/command", Float64, queue_size=1)
+        self.pub_steering = rospy.Publisher("bobcat/ackermann_steer/command", Float64, queue_size=1)
 
     def callback_controller(self,data):
+        print data
         self.set_speed(data.axes[1])
-        self.set_steering(data.axes[0])
+        self.set_steering(data.axes[3])
         #rospy.loginfo("Joystick speed "+ str(int(self.motor)*100))
 
     def set_speed(self, new_speed):
