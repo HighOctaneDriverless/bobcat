@@ -112,7 +112,7 @@
   <joint name="left_rear_wheel_joint" type="continuous">
     <parent link="base_link" />
     <child link="left_rear_wheel" />
-    <origin xyz="${-tyre_x} ${tyre_y} ${tyre_r}" rpy="0 0 0"/>
+    <origin xyz="${-tyre_x} ${tyre_y} ${tyre_r}" rpy="0 0 ${PI}"/>
     <axis xyz="0 1 0" />
     <dynamics damping="0.1"/>
     <limit effort="10000" velocity="100" />
@@ -196,7 +196,7 @@
   <joint name="left_steering_hinge_joint" type="revolute">
     <parent link="base_link" />
     <child link="left_steering_hinge" />
-    <origin xyz="${tyre_x} ${car_width/2 + str_length/2} ${tyre_r}" rpy="0 0 0"/>
+    <origin xyz="${tyre_x} ${car_width/2 + str_length/2} ${tyre_r}" rpy="0 0 ${PI}"/>
     <axis xyz="0 0 1"/>
     <limit effort="1000.0" lower="${-str_angle}" upper="${str_angle}" velocity="0.5"/>
   </joint>
@@ -212,7 +212,7 @@
     <collision>
       <xacro:insert_block name="tyre_origin"/>
       <geometry>
-        <cylinder length="${tyre_length}" radius="${tyre_radius}"/>
+        <cylinder length="${str_length}" radius="${str_radius}"/>
       </geometry>
     </collision>
     <visual>
