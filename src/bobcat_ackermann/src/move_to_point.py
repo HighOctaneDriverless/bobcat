@@ -16,8 +16,8 @@ class MoveToPoint():
         self.newPose = CarPose()
         
         self.maxSpeed = 2 #m/s
-        self.kbeta_t = 1.4
-        self.kalpha = 1.5
+        self.kbeta_t = 1.5
+        self.kalpha = 0.7
         self.moveToPointActive = False
         self.direction = 0
         self.lastRho = 100000
@@ -112,7 +112,7 @@ class MoveToPoint():
         tmp1 = ySin + xCos
         tmp2 = xSin + yCos
         print "local pose  x: " + str(tmp1) + "y: " + str(tmp2) + "yaw: " + str(tmpPoseDiff.yaw * 180/math.pi)
-
+        print "difference goal yaw tmp yaw: " + str(self.newGoalPose.yaw - tmpPoseDiff.yaw)
         # calculate delta x and delta y
         deltaX = ySin + xCos - self.newGoalPose.x
         deltaY = xSin + yCos - self.newGoalPose.y

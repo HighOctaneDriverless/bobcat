@@ -57,7 +57,8 @@
 <xacro:macro name="chassis_geometry">
   <origin xyz="0 0 0" rpy="0 0 0" />
   <geometry>
-    <mesh filename="package://bobcat_description/meshes/chassis.STL" />
+    <!--mesh filename="package://bobcat_description/meshes/chassis.STL" /-->
+    <box size="${car_length} ${car_width} ${car_height}"/>
   </geometry>
 </xacro:macro>
 

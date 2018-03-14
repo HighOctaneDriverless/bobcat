@@ -3,15 +3,61 @@
 
   <xacro:include filename="$(find bobcat_description)/urdf/macros.xacro" />
 
+
+  <xacro:property name="PI" value="3.1415926835897931"/>
+<!--  <xacro:property name="base_height" value="0"/> -->
+  <xacro:property name="base_height" value="1.0639"/>
+  <xacro:property name="base_mass" value="2050"/>
+  <xacro:property name="base_mass_ixx" value="63"/>
+  <xacro:property name="base_mass_iyy" value="1048"/>
+  <xacro:property name="base_mass_izz" value="1111"/>
+  <xacro:property name="base_mass_ixz" value="-31"/>
+  <xacro:property name="tyre_x" value="1.31"/>
+  <xacro:property name="tyre_y" value="0.765"/>
+  <xacro:property name="tyre_length" value="0.229"/>
+  <xacro:property name="tyre_r" value="0.66"/>
+  <xacro:property name="tyre_radius" value="0.356"/>
+  <xacro:property name="tyre_mass" value="40"/>
+  <xacro:property name="tyre_mass_ixx" value="54"/>
+  <xacro:property name="tyre_mass_iyy" value="56"/>
+  <xacro:property name="tyre_mass_izz" value="104"/>
+  <xacro:property name="car_height" value="0.8"/>
+  <xacro:property name="car_width" value="1.440"/>
+  <xacro:property name="car_length" value="1.54"/>
+  <xacro:property name="camera_box" value="0.1"/>
+  <xacro:property name="tyre_height" value="-0.696"/>
+  <xacro:property name="str_length" value="0.01"/>
+  <xacro:property name="str_radius" value="0.1"/>
+  <xacro:property name="str_angle" value="0.6"/>
+  <xacro:property name="tyre_origin">
+	<origin xyz="0 0 0" rpy="${PI/2} 0 0"/>
+  </xacro:property>
+  <xacro:property name="tyre_origin_2">
+        <origin xyz="0 0 0" rpy="0 0 ${PI/2}"/>
+  </xacro:property>
+  <xacro:property name="tyre_origin_3">
+        <origin xyz="0 0 0" rpy="0 0 ${-PI/2}"/>
+  </xacro:property>
+
   <!-- Add chassis and it's inertia link -->
 
   <link name="base_link" />
 
   <link name="chassis">
     <visual>
-      <xacro:chassis_geometry/>
+      <!--xacro:chassis_geometry/-->  
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <box size="${car_length} ${car_width} ${car_height}"/>
+      </geometry>
       <material name="blue" />
     </visual>
+    <collision>
+	<origin xyz="0 0 ${base_height}" rpy= "0 0 0"/>
+        <geometry> 
+            <box size="${car_length} ${car_width} ${car_height}"/>
+        </geometry>
+    </collision>
   </link>
 
   <joint name="base_link_joint" type="fixed">
@@ -22,8 +68,14 @@
 
   <link name="chassis_inertia">
     <inertial>
-      <xacro:chassis_inertial_params />
-    </inertial>
+      <!--xacro:chassis_inertial_params /-->
+      <origin xyz="0 0 ${base_height}" rpy="0 0 0" />
+      <mass value="${base_mass}" />
+      <inertia
+          ixx="${base_mass_ixx}"  ixy="0.000000" ixz="${base_mass_ixz}"
+          iyy="${base_mass_iyy}" iyz="0.000000"
+          izz="${base_mass_izz}"/>
+      </inertial>
   </link>
 
   <joint name="chassis_inertia_joint" type="fixed">
@@ -52,7 +104,7 @@
     <parent link="chassis" />
     <child link="left_rear_wheel" />
     <axis xyz="0 0 -1" />
-    <limit effort="10" velocity="100" />
+    <limit effort="10000" velocity="100" />
   </joint>
 
   <xacro:wheel_transmission name="left_rear_wheel" />
