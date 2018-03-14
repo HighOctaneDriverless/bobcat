@@ -112,6 +112,7 @@
   <joint name="left_rear_wheel_joint" type="continuous">
     <parent link="base_link" />
     <child link="left_rear_wheel" />
+<!-- here y is PI as the car will be mounted in the same direction as the right wheel and that somewhat seems wrong. When you turn this back for whatever reason remember to set axis to +1 as it will turn in the wrong direction otherwise -->
     <origin xyz="${-tyre_x} ${tyre_y} ${tyre_r}" rpy="0 0 ${PI}"/>
     <axis xyz="0 -1 0" />
     <dynamics damping="0.1"/>
@@ -332,7 +333,7 @@
 
   <!-- Add Hokuyo laser scanner -->
 
-  <!--link name="laser">
+  <link name="laser">
     <inertial>
       <xacro:hokuyo_inertial_params />
     </inertial>
@@ -352,15 +353,15 @@
   </link>
 
   <joint name="hokuyo_joint" type="fixed">
-    <origin xyz="0.265 0.0 0.075" rpy="0 0 0"/>
+    <origin xyz="${tyre_x - 0.1} 0 ${car_height + tyre_r + 0.05}" />
     <parent link="base_link" />
     <child link="laser" />
     <axis xyz="0 0 1" />
-  </joint-->
+  </joint>
 
 
   <!-- zed camera -->
-  <!--link name="zed_camera_link">
+  <link name="zed_camera_link">
     <inertial>
       <mass value="1e-5" />
       <origin xyz="0 0 0" rpy="0 0 0"/>
@@ -382,18 +383,18 @@
   </link>
 
   <joint name="zed_camera_joint" type="fixed">
-    <origin xyz="0.390 0 0.04" rpy="0 0 0"/>
+     <origin xyz="${tyre_x + 0.016} 0 ${car_height + tyre_r/2 }" />
     <parent link="base_link"/>
     <child link="zed_camera_link"/>
     <axis xyz="0 0 1" />
-    <limit lower="0.0" upper="0.0" effort="0.0" velocity="0.0" /-->
-  <!--/joint-->
+    <!--limit lower="0.0" upper="0.0" effort="0.0" velocity="0.0" /-->
+  </joint>
 
 
   <!-- zed camera lenses -->
   <!-- It seems these have to have a non-zero mass to have a camera attached? -->
-  <!--link name="camera_link"--><!-- this needs to match the name in zed_wrapper/zed_tf.launch -->
-    <!--inertial>
+  <link name="camera_link"><!-- this needs to match the name in zed_wrapper/zed_tf.launch -->
+    <inertial>
       <mass value="1e-5" />
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
@@ -418,7 +419,7 @@
     <parent link="zed_camera_link"/>
     <child link="zed_camera_right_link"/>
     <axis xyz="0 0 1" />
-  </joint-->
+  </joint>
 
   <!-- Add the remaining xacros -->
 

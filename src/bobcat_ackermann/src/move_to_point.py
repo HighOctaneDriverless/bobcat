@@ -17,7 +17,7 @@ class MoveToPoint():
         
         self.maxSpeed = 2 #m/s
         self.kbeta_t = 1.5
-        self.kalpha = 0.7
+        self.kalpha = 2.0
         self.moveToPointActive = False
         self.direction = 0
         self.lastRho = 100000
