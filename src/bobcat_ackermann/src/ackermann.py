@@ -4,7 +4,6 @@ import rospy
 import numpy as np
 from std_msgs.msg import Float64
 from gazebo_msgs.msg import ModelStates
-from sensor_msgs.msg import Joy
 import math
 
 class Ackermann():
@@ -18,13 +17,13 @@ class Ackermann():
         self.speed_out = Float64(0.0)
         #value between -1.0 and 1.0 | straight 0.0
         self.steering = 0.0
-        self.steering_left = 0.0
-        self.steering_right = 0.0
+        self.steeringRight = 0.0
+        self.steeringLeft = 0.0
 
 
         #CONSTANTS from model
-        self.L = 2.0   #Radstand
-        self.Ba = 1.0  #Achsschenkelbolzenabstand
+        self.L = 2.6     #wheelbase
+        self.lw = 1.301  #width
 
         #init ros_node
         rospy.init_node('ackermann_control', anonymous=True)
@@ -37,7 +36,18 @@ class Ackermann():
                                              queue_size=1)
 
     def callback_steering(self, data):
-        self.set_steering(data.data)
+        desiredSteeringAngle = data.data       
+        
+        if(desiredSteeringAngle > 0):            
+            self.steeringRight = self.L/((self.L/desiredSteeringAngle) + self.lw/2.0)         
+            self.steeringLeft = self.L/((self.L/desiredSteeringAngle) - self.lw/2.0)
+        elif(desiredSteeringAngle < 0):
+            self.steeringRight = self.L/((self.L/desiredSteeringAngle) + self.lw/2.0)         
+            self.steeringLeft = self.L/((self.L/desiredSteeringAngle) - self.lw/2.0)
+        else:
+            self.steeringRight = 0
+            self.steeringLeft = 0
+            
 
     def callback_speed(self, data):
         self.set_speed(data.data)
@@ -61,7 +71,7 @@ class Ackermann():
 
 
     def set_speed(self, new_speed):
-        self.desired_speed.data = new_speed / 8
+        self.desired_speed.data = new_speed
 
     def set_steering(self, new_steering):
         self.steering = new_steering
@@ -76,7 +86,7 @@ class Ackermann():
         #rospy.spin()
 
     def pid(self):
-        p = 2.5 # 3 as initial guess :D i and d missing for now needs to be determined how much that is needed
+        p = 1000 # 3 as initial guess :D i and d missing for now needs to be determined how much that is needed
         #print "desired_speed : " + repr(self.desired_speed) + "   measured_speed: " + repr(self.measured_speed)
         #print "measured_speed: "
         #print type(self.measured_speed)
@@ -85,18 +95,14 @@ class Ackermann():
         
         diff =  self.desired_speed.data - np.median(self.median_filter)
         self.speed_out = diff * p
-        if (self.speed_out > 1.2):
-            self.speed_out = 1.2
-        elif (self.speed_out < -1.2):
-            self.speed_out = -1.2
         rospy.loginfo("desired_speed "+ str(self.desired_speed.data) + "  measured_speed" + str(np.median(self.median_filter)) + "  output: " + str(self.speed_out))
 
     def publish(self):
         self.pid()
         self.pub_acc_left.publish(self.speed_out)
         self.pub_acc_right.publish(self.speed_out)
-        self.pub_steering_left.publish(self.steering)
-        self.pub_steering_right.publish(self.steering)
+        self.pub_steering_left.publish(self.steeringLeft)
+        self.pub_steering_right.publish(self.steeringRight)
         #rospy.loginfo("Speed: "+str(self.speed_out)+"Steer: "+str(self.steering))
 
 

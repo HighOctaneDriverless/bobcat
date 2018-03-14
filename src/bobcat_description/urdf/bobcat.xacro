@@ -113,9 +113,9 @@
     <parent link="base_link" />
     <child link="left_rear_wheel" />
     <origin xyz="${-tyre_x} ${tyre_y} ${tyre_r}" rpy="0 0 ${PI}"/>
-    <axis xyz="0 1 0" />
+    <axis xyz="0 -1 0" />
     <dynamics damping="0.1"/>
-    <limit effort="10000" velocity="100" />
+    <limit effort="100000" velocity="1000" />
     <joint_properties damping="0.0" friction="0.0" />
   </joint>
   <!-- this transmission is added to connect to wheel effort controller! dont delete"-->
@@ -159,7 +159,7 @@
     <origin xyz="${-tyre_x} ${-tyre_y} ${tyre_r}" rpy="0 0 0"/>
     <axis xyz="0 1 0"/>
     <dynamics damping="0.1"/>
-    <limit effort="10000" velocity="100" />
+    <limit effort="100000" velocity="1000" />
     <joint_properties damping="0.0" friction="0.0" />
   </joint>
   <!-- this transmission is added to connect to wheel effort controller! dont delete"-->
