@@ -15,9 +15,9 @@ class MoveToPoint():
         self.startPose = CarPose()
         self.newPose = CarPose()
         
-        self.maxSpeed = 2 #m/s
-        self.kbeta_t = 1.5
-        self.kalpha = 2.0
+        self.maxSpeed = 1 #m/s
+        self.kbeta_t = 5
+        self.kalpha = 3
         self.moveToPointActive = False
         self.direction = 0
         self.lastRho = 100000
@@ -135,7 +135,7 @@ class MoveToPoint():
             self.lastRho = rho
 
         
-        speedOut = rho * self.maxSpeed  + 0.3
+        speedOut = rho * self.maxSpeed  + 0.1
         if(speedOut > self.maxSpeed):
             speedOut = self.maxSpeed
         

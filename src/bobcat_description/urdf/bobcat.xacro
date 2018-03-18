@@ -6,29 +6,29 @@
 
   <xacro:property name="PI" value="3.1415926835897931"/>
 <!--  <xacro:property name="base_height" value="0"/> -->
-  <xacro:property name="base_height" value="1.0639"/>
-  <xacro:property name="base_mass" value="2050"/>
-  <xacro:property name="base_mass_ixx" value="63"/>
-  <xacro:property name="base_mass_iyy" value="1048"/>
-  <xacro:property name="base_mass_izz" value="1111"/>
-  <xacro:property name="base_mass_ixz" value="-31"/>
-  <xacro:property name="tyre_x" value="1.31"/>
-  <xacro:property name="tyre_y" value="0.765"/>
+  <xacro:property name="base_height" value="0.4"/>
+  <xacro:property name="base_mass" value="1000"/>
+  <xacro:property name="base_mass_ixx" value="30"/>
+  <xacro:property name="base_mass_iyy" value="500"/>
+  <xacro:property name="base_mass_izz" value="550"/>
+  <xacro:property name="base_mass_ixz" value="-15"/>
+  <xacro:property name="tyre_x" value="0.76"/>
+  <xacro:property name="tyre_y" value="0.5"/>
   <xacro:property name="tyre_length" value="0.229"/>
   <xacro:property name="tyre_height" value="-0.696"/>
-  <xacro:property name="tyre_r" value="0.66"/>
-  <xacro:property name="tyre_radius" value="0.356"/>
-  <xacro:property name="tyre_mass" value="40"/>
-  <xacro:property name="tyre_mass_ixx" value="54"/>
-  <xacro:property name="tyre_mass_iyy" value="56"/>
-  <xacro:property name="tyre_mass_izz" value="104"/>
-  <xacro:property name="car_height" value="0.8"/>
-  <xacro:property name="car_width" value="1.301"/>
-  <xacro:property name="car_length" value="2.62"/>
+  <xacro:property name="tyre_r" value="0.22"/>
+  <xacro:property name="tyre_radius" value="0.22"/>
+  <xacro:property name="tyre_mass" value="3"/>
+  <xacro:property name="tyre_mass_ixx" value="20"/>
+  <xacro:property name="tyre_mass_iyy" value="20"/>
+  <xacro:property name="tyre_mass_izz" value="50"/>
+  <xacro:property name="car_height" value="0.6"/>
+  <xacro:property name="car_width" value="1.0"/>
+  <xacro:property name="car_length" value="1.54"/>
   <xacro:property name="camera_box" value="0.1"/>
   <xacro:property name="str_length" value="0.01"/>
   <xacro:property name="str_radius" value="0.1"/>
-  <xacro:property name="str_angle" value="0.6"/>
+  <xacro:property name="str_angle" value="0.5"/>
   <xacro:property name="tyre_origin">
 	<origin xyz="0 0 0" rpy="${PI/2} 0 0"/>
   </xacro:property>
@@ -53,6 +53,7 @@
       <!--xacro:chassis_geometry/-->  
       <origin xyz="0 0 ${base_height}" rpy="0 0 0" />
       <geometry>
+	 <!--mesh><uri>file://kappa_scene.dae</uri></mesh-->
         <box size="${car_length} ${car_width} ${car_height}"/>
       </geometry>
       <material name="blue" />
@@ -69,6 +70,7 @@
           iyy="${base_mass_iyy}"  iyz="0.000000"
           izz="${base_mass_izz}"/>
       </inertial>
+      <dampingFactor>0.1</dampingFactor>
   </link>
 
   <joint name="inertia_joint" type="fixed">
@@ -113,10 +115,10 @@
     <parent link="base_link" />
     <child link="left_rear_wheel" />
 <!-- here y is PI as the car will be mounted in the same direction as the right wheel and that somewhat seems wrong. When you turn this back for whatever reason remember to set axis to +1 as it will turn in the wrong direction otherwise -->
-    <origin xyz="${-tyre_x} ${tyre_y} ${tyre_r}" rpy="0 0 ${PI}"/>
+    <origin xyz="${-tyre_x} ${car_width/2 + tyre_length/2} ${tyre_r}" rpy="0 0 ${PI}"/>
     <axis xyz="0 -1 0" />
-    <dynamics damping="0.1"/>
-    <limit effort="100000" velocity="1000" />
+    <dynamics damping="0.2"/>
+    <limit effort="100000" velocity="100" />
     <joint_properties damping="0.0" friction="0.0" />
   </joint>
   <!-- this transmission is added to connect to wheel effort controller! dont delete"-->
@@ -157,10 +159,10 @@
   <joint name="right_rear_wheel_joint" type="continuous">
     <parent link="base_link" />
     <child link="right_rear_wheel" />
-    <origin xyz="${-tyre_x} ${-tyre_y} ${tyre_r}" rpy="0 0 0"/>
+    <origin xyz="${-tyre_x} ${-car_width/2 - tyre_length/2} ${tyre_r}" rpy="0 0 0"/>
     <axis xyz="0 1 0"/>
-    <dynamics damping="0.1"/>
-    <limit effort="100000" velocity="1000" />
+    <dynamics damping="0.2"/>
+    <limit effort="100000" velocity="100" />
     <joint_properties damping="0.0" friction="0.0" />
   </joint>
   <!-- this transmission is added to connect to wheel effort controller! dont delete"-->
@@ -199,7 +201,7 @@
     <child link="left_steering_hinge" />
     <origin xyz="${tyre_x} ${car_width/2 + str_length/2} ${tyre_r}" rpy="0 0 ${PI}"/>
     <axis xyz="0 0 1"/>
-    <limit effort="1000.0" lower="${-str_angle}" upper="${str_angle}" velocity="0.5"/>
+    <limit effort="1000.0" lower="${-str_angle}" upper="${str_angle}" velocity="1.0"/>
   </joint>
   <!-- this transmission is added to connect to wheel effort controller! dont delete"-->
   <xacro:steering_hinge_transmission name="left_steering_hinge" />
@@ -237,7 +239,7 @@
     <child link="right_steering_hinge" />
     <origin xyz="${tyre_x} ${-car_width/2 - str_length/2} ${tyre_r}" rpy="0 0 0"/>
     <axis xyz="0 0 1"/>
-    <limit effort="1000.0" lower="${-str_angle}" upper="${str_angle}" velocity="0.5"/>
+    <limit effort="1000.0" lower="${-str_angle}" upper="${str_angle}" velocity="1.0"/>
   </joint>
   <!-- this transmission is added to connect to wheel effort controller! dont delete"-->
   <xacro:steering_hinge_transmission name="right_steering_hinge" />
@@ -353,7 +355,7 @@
   </link>
 
   <joint name="hokuyo_joint" type="fixed">
-    <origin xyz="${tyre_x - 0.1} 0 ${car_height + tyre_r + 0.05}" />
+    <origin xyz="${tyre_x + 0.1} 0 ${car_height - tyre_r/2}" />
     <parent link="base_link" />
     <child link="laser" />
     <axis xyz="0 0 1" />
@@ -383,7 +385,7 @@
   </link>
 
   <joint name="zed_camera_joint" type="fixed">
-     <origin xyz="${tyre_x + 0.016} 0 ${car_height + tyre_r/2 }" />
+    <origin xyz="${tyre_x} 0 ${car_height + tyre_r/2}" />
     <parent link="base_link"/>
     <child link="zed_camera_link"/>
     <axis xyz="0 0 1" />
