@@ -27,11 +27,11 @@ bobcat:
   left_steering_hinge_position_controller:
     joint: left_steering_hinge_joint
     type: effort_controllers/JointPositionController
-    pid: {p: 10000.0, i: 0.00, d: 1000.0}
+    pid: {p: 10000.0, i: 0.00, d: 100.0}
 
   right_steering_hinge_position_controller:
     joint: right_steering_hinge_joint
     type: effort_controllers/JointPositionController
-    pid: {p: 10000.0, i: 0.00, d: 1000.0}
+    pid: {p: 10000.0, i: 0.00, d: 100.0}
 
 

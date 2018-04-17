@@ -5,6 +5,7 @@ import numpy as np
 from std_msgs.msg import Float64
 from gazebo_msgs.msg import ModelStates
 import math
+import tf
 
 class Ackermann():
     def __init__(self):
@@ -36,12 +37,18 @@ class Ackermann():
                                              queue_size=1)
 
     def callback_steering(self, data):
-        desiredSteeringAngle = data.data       
+        desiredSteeringAngle = data.data   
+	maxCarSteerAngle = 30*math.pi/180  
+	maxSteerAngle = self.L/((self.L/maxCarSteerAngle) + self.lw/2.0)
         
-        if(desiredSteeringAngle > 0):            
+        if(desiredSteeringAngle > 0):
+	    if(desiredSteeringAngle > maxSteerAngle):
+		desiredSteeringAngle = maxSteerAngle            
             self.steeringRight = self.L/((self.L/desiredSteeringAngle) + self.lw/2.0)         
             self.steeringLeft = self.L/((self.L/desiredSteeringAngle) - self.lw/2.0)
         elif(desiredSteeringAngle < 0):
+            if(desiredSteeringAngle < -maxSteerAngle):
+		desiredSteeringAngle = -maxSteerAngle            
             self.steeringRight = self.L/((self.L/desiredSteeringAngle) + self.lw/2.0)         
             self.steeringLeft = self.L/((self.L/desiredSteeringAngle) - self.lw/2.0)
         else:
@@ -51,26 +58,51 @@ class Ackermann():
 
     def callback_speed(self, data):
         self.set_speed(data.data)
+        
+        
+    def transform_quaternion_euler(self, pose):
+        #type(pose) = geometry_msgs.msg.Pose
+        quaternion = (
+            pose.orientation.x,
+            pose.orientation.y,
+            pose.orientation.z,
+            pose.orientation.w)
+        euler = tf.transformations.euler_from_quaternion(quaternion)
+        #roll = euler[0]
+        #pitch = euler[1]
+        #yaw = euler[2]                
+        return euler 
 
     def callback_state(self, data):
+        orient = self.transform_quaternion_euler(data.pose[-1])[2]
         x = data.twist[-1].linear.x
         y = data.twist[-1].linear.y
-        if x+ y > 0.0:
-            self.measured_speed = math.sqrt(x**2 + y**2)
+        
+        orient = orient % (2*math.pi)
+        if(orient <= math.pi/2 or orient >= (math.pi + math.pi /2)):
+            if(x >= 0.0): #drives forward
+                direction = 1
+            else: #drives backwards
+                direction = -1
         else:
-            self.measured_speed = - math.sqrt(x**2 + y**2)
+            if(x >= 0.0): # drives backwards
+                direction = -1
+            else: # drives forwards
+                direction = 1
             
+        self.measured_speed = math.sqrt(x**2 + y**2) * direction
+  
         self.median_filter = np.roll(self.median_filter, -1)
         self.median_filter[-1] = self.measured_speed
-
-
-    def callback_controller(self,data):
-        self.set_speed(data.axes[1]/2)
-        self.set_steering(data.axes[0])
-        rospy.loginfo("Joystick speed "+ str(data.axes[1]/2))
+        #print("%.2f" % a)
+        rospy.loginfo("speed_x: "+ str("%.2f" % x) + "  speed_y: " + str("%.2f" % y) + "  orientation: " + str("%.2f" % orient) + "  direction: " + str(direction))
 
 
     def set_speed(self, new_speed):
+        if new_speed > 2:
+                new_speed = 2
+        if new_speed < -2:
+                new_speed = -2
         self.desired_speed.data = new_speed
 
     def set_steering(self, new_steering):
@@ -86,16 +118,15 @@ class Ackermann():
         #rospy.spin()
 
     def pid(self):
-        p = 1000 # 3 as initial guess :D i and d missing for now needs to be determined how much that is needed
-        #print "desired_speed : " + repr(self.desired_speed) + "   measured_speed: " + repr(self.measured_speed)
-        #print "measured_speed: "
-        #print type(self.measured_speed)
-        #print "desired_speed: "
-        #print type(self.desired_speed.data)
-        
+        p = 600 
+ 
         diff =  self.desired_speed.data - np.median(self.median_filter)
         self.speed_out = diff * p
-        rospy.loginfo("desired_speed "+ str(self.desired_speed.data) + "  measured_speed" + str(np.median(self.median_filter)) + "  output: " + str(self.speed_out))
+	if(self.speed_out > 1000):
+		self.speed_out = 1000	
+	if(self.speed_out < -1000):
+		self.speed_out = -1000	
+        #rospy.loginfo("desired_speed "+ str(self.desired_speed.data) + "  measured_speed" + str(np.median(self.median_filter)) + "  output: " + str(self.speed_out))
 
     def publish(self):
         self.pid()
