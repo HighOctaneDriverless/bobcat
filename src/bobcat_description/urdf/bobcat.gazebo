@@ -75,6 +75,51 @@
   </plugin>
 </gazebo>
 
+<gazebo> <!-- GPS plugin -->
+ <plugin name="robot_gps_sim" filename="libhector_gazebo_ros_gps.so">
+  <alwaysOn>true</alwaysOn>
+  <updateRate>4.0</updateRate>
+  <bodyName>base_link</bodyName>
+  <topicName>gps</topicName>
+  <velocityTopicName>gps_velocity</velocityTopicName>
+  <drift>5.0 5.0 5.0</drift>
+  <gaussianNoise>0.1 0.1 0.1</gaussianNoise>
+  <velocityDrift>0 0 0</velocityDrift>
+  <velocityGaussianNoise>0.1 0.1 0.1</velocityGaussianNoise>
+ </plugin>
+
+ <!-- Groundtruth plugin -->
+ <plugin name="robot_groundtruth_sim" filename="libgazebo_ros_p3d.so">
+  <alwaysOn>true</alwaysOn>
+  <updateRate>100.0</updateRate>
+  <bodyName>base_link</bodyName>
+  <topicName>/odom</topicName>
+  <gaussianNoise>0.1</gaussianNoise>
+  <frameName>map</frameName>
+  <xyzOffsets>0 0 0</xyzOffsets>
+  <rpyOffsets>0 0 0</rpyOffsets>
+ </plugin> 
+
+ <!-- IMU plugin -->
+ <plugin name="robot_imu_sim" filename="libhector_gazebo_ros_imu.so">
+    <alwaysOn>true</alwaysOn>
+    <updateRate>100.0</updateRate> 
+    <bodyName>base_link</bodyName>
+    <frameID>robot_link1</frameID>
+    <topicName>imu_data</topicName>
+    <xyzOffset>0.0 0.0 0.0</xyzOffset>
+    <rpyOffset>0.0 0.0 0.0</rpyOffset>
+    <gaussianNoise>0</gaussianNoise>
+    <accelDrift>0.5 0.5 0.5</accelDrift>
+    <accelGaussianNoise>0.35 0.35 0.3</accelGaussianNoise>
+    <rateDrift>0.0 0.0 0.0</rateDrift>
+    <rateGaussianNoise>0.00 0.00 0.00</rateGaussianNoise>
+    <headingDrift>0.0</headingDrift>
+    <headingGaussianNoise>0.00</headingGaussianNoise>
+ </plugin> 
+</gazebo>
+
+
   <!-- hokuyo -->
 <xacro:unless value="$(optenv DISABLE_GAZEBO_LASER false)">
   <gazebo reference="laser">
