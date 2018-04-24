@@ -12,6 +12,9 @@
   <include file="$(find obstacle_detector)/launch/nodes.launch">
     <!--<remap from="pcl" to="/camera/depth/points" />-->
   </include>
+  <node name="depthimage_to_laserscan" pkg="depthimage_to_laserscan" type="depthimage_to_laserscan" > 
+  <remap from="image" to="/camera/depth/image_raw"/>
+  </node>
 
   <node name="rviz" pkg="rviz" type="rviz" /> 
     
