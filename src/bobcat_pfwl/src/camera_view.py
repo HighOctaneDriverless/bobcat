@@ -14,16 +14,17 @@ class Camera_view():
         	rospy.init_node('pfwl', anonymous=True)
 
 		self.timedelta = 0
-		#rospy.Subscriber("/camera/rgb/image_raw",Image,self.callbackRGB)
+		rospy.Subscriber("/camera/rgb/image_raw",Image,self.callbackRGB)
 		self.image = np.zeros((480,640,3))
 		rospy.Subscriber("/raw_obstacles",obs,self.callbackObstacle)
 		#rospy.Subscriber("/camera/depth/image",Image,self.callbackDepth)
-
+		
+		self.img_sliced = np.ones((1,640,3))
 		#images
 		#self.rgb_slice = np.zeros((40,640,3))
 		#self.d_slice = np.zeros((40,640,1))
-		
 
+		self.x_vals = []
 		#canny parameters
 		self.ratio = 3
 		self.kernel_size = 3
@@ -32,26 +33,47 @@ class Camera_view():
 	def callbackObstacle(self,obstacles):
 		print("obstacles", len(obstacles.circles))
 		objects = obstacles.circles
+		self.x_vals = []		
 		for i in range(0,len(objects)):
 			rad = math.atan(objects[i].center.x/objects[i].center.y)
-			degree = rad*180/math.pi			
-			print('angel '+str(i),degree)
-			print('rad' +str(i),rad)
+			degree = rad*180/math.pi
+			if(degree>0):
+				self.x_vals.append(295/29*abs(61-degree))
+			else:
+				self.x_vals.append((640-295)/29*(90-abs(degree))+295)
+			#print(self.image_sliced)
+			#color = self.image_sliced[0,x_val,:]
+			#print('color', color) 
+			#print("pixel", self.x_vals[i])			
+			#print('angel '+str(i),degree)
+			#print('rad' +str(i),rad)
+		self.color()
+		
 
 	def callbackRGB(self,image):
 		np_arr = np.fromstring(image.data, np.uint8)
 		#print(str(np_arr.shape))
 		self.image = np_arr.reshape((480,640,3))
 		self.image = self.image[...,::-1]
-		img_sliced = self.image[240:241,:,:]
-		rgb_slice = np.repeat(img_sliced,40,axis=0)
+		self.img_sliced = self.image[240:241,:,:]
+		#print(image_sliced)
+		
+		#rgb_slice = np.repeat(self.img_sliced,40,axis=0)
 		#self.canny()
-		#print(str(img_slice.shape))
+		#print(self.img_sliced.shape)
+		#cv2.imshow('Image',rgb_slice)
+		#cv2.waitKey(1)
+
+	def color(self):
+		for i in range(0,len(self.x_vals)):
+			print('object ',i)
+			color = self.img_sliced[0,self.x_vals[i],:]
+			print('color', color)
+		rgb_slice = np.repeat(self.img_sliced,40,axis=0)
+		#self.canny()
+		#print(self.img_sliced.shape)
 		cv2.imshow('Image',rgb_slice)
 		cv2.waitKey(1)
-
-	def color(self, middle):
-		pass
 
 	def callbackDepth(self,image):
 		np_arr = np.fromstring(image.data, np.float32)
@@ -97,10 +119,11 @@ class Camera_view():
 def main():
 	cam = Camera_view()
 	rospy.loginfo("cam infos started")
-	rate = rospy.Rate(0.5)
+	rate = rospy.Rate(10)
 	while not rospy.is_shutdown():
 		#cam.write()
 		#cam.show()
+		#cam.color()
 		rate.sleep()
 
 if __name__ == '__main__':
