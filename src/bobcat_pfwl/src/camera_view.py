@@ -5,9 +5,8 @@ from sensor_msgs.msg import Image
 import cv2
 import numpy as np
 import sys
-from sklearn.cluster import DBSCAN
-import matplotlib.pyplot as plt
-from sklearn.neighbors.kde import KernelDensity
+import math
+from obstacle_detector.msg import Obstacles as obs
 
 class Camera_view():
 	def __init__(self):
@@ -15,18 +14,29 @@ class Camera_view():
         	rospy.init_node('pfwl', anonymous=True)
 
 		self.timedelta = 0
-		rospy.Subscriber("/camera/rgb/image_raw",Image,self.callbackRGB)
-		self.image = np.zeros((480,640,3)) 
-		rospy.Subscriber("/camera/depth/image",Image,self.callbackDepth)
+		#rospy.Subscriber("/camera/rgb/image_raw",Image,self.callbackRGB)
+		self.image = np.zeros((480,640,3))
+		rospy.Subscriber("/raw_obstacles",obs,self.callbackObstacle)
+		#rospy.Subscriber("/camera/depth/image",Image,self.callbackDepth)
 
 		#images
 		#self.rgb_slice = np.zeros((40,640,3))
 		#self.d_slice = np.zeros((40,640,1))
+		
 
 		#canny parameters
 		self.ratio = 3
 		self.kernel_size = 3
 		self.threshold = 50 # between 0 and 100
+
+	def callbackObstacle(self,obstacles):
+		print("obstacles", len(obstacles.circles))
+		objects = obstacles.circles
+		for i in range(0,len(objects)):
+			rad = math.atan(objects[i].center.x/objects[i].center.y)
+			degree = rad*180/math.pi			
+			print('angel '+str(i),degree)
+			print('rad' +str(i),rad)
 
 	def callbackRGB(self,image):
 		np_arr = np.fromstring(image.data, np.uint8)
@@ -37,8 +47,11 @@ class Camera_view():
 		rgb_slice = np.repeat(img_sliced,40,axis=0)
 		#self.canny()
 		#print(str(img_slice.shape))
-		#cv2.imshow('Image',rgb_slice)
-		#cv2.waitKey(1)
+		cv2.imshow('Image',rgb_slice)
+		cv2.waitKey(1)
+
+	def color(self, middle):
+		pass
 
 	def callbackDepth(self,image):
 		np_arr = np.fromstring(image.data, np.float32)
@@ -79,52 +92,6 @@ class Camera_view():
 			print("file saved")
 		except: 
 			print("error",sys.exc_info()[0])
-
-	def canny(self):
-		img_gray = cv2.cvtColor(self.image,cv2.COLOR_RGB2GRAY)
-		img_gray = cv2.blur(img_gray,(3,3))
-		edges = cv2.Canny(img_gray,self.threshold,self.threshold*self.ratio,self.kernel_size)
-		cv2.imshow("Canny",edges)
-
-	def kernel(self, X):
-		kde = KernelDensity(kernel='gaussian', bandwidth=0.2).fit(X)
-		plt.plot(kde)
-
-	def dbscan(self, values):
-		#print(values)
-		#print(values.T.shape)
-		values = values.T
-		db = DBSCAN(eps=2, min_samples=2).fit(values)
-		core_samples_mask = np.zeros_like(db.labels_, dtype=bool)
-		core_samples_mask[db.core_sample_indices_] = True
-		labels = db.labels_
-
-		# Number of clusters in labels, ignoring noise if present.
-		n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
-		
-		# Plot result
-
-
-		# Black removed and is used for noise instead.
-		unique_labels = set(labels)
-		colors = [plt.cm.Spectral(each)
-          	for each in np.linspace(0, 1, len(unique_labels))]
-		for k, col in zip(unique_labels, colors):
-    			if k == -1:
-       			 # Black used for noise.
-        			col = [0, 0, 0, 1]
- 				class_member_mask = (labels == k)
- 				xy = values[class_member_mask & core_samples_mask]
-    				plt.plot(xy[:, 0], xy[:, 1], 'o', markerfacecolor=tuple(col), 						markeredgecolor='k', markersize=14)
-
-    				xy = values[class_member_mask & ~core_samples_mask]
-				plt.plot(xy[:, 0], xy[:, 1], 'o', markerfacecolor=tuple(col),
-					markeredgecolor='k', markersize=6)
-
-		plt.title('Estimated number of clusters: %d' % n_clusters_)
-		#plt.savefig('clusters.png')		
-		plt.show()
-		
 
 
 def main():
