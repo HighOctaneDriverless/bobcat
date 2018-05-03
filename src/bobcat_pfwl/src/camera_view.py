@@ -108,7 +108,7 @@ class Camera_view():
 	
 	def write(self):
 		try:
-			filename = "../pics/image_t"+str(self.timedelta)+".png"
+			filename = "/home/nvidia/catkin_ws/src/bobcat/src/bobcat_pfwl/pics/image_t"+str(self.timedelta)+".png"
 			cv2.imwrite(filename,self.image)
 			self.timedelta = self.timedelta + 1
 			print("file saved")
@@ -124,6 +124,7 @@ def main():
 		#cam.write()
 		#cam.show()
 		#cam.color()
+		#cam.write()
 		rate.sleep()
 
 if __name__ == '__main__':
