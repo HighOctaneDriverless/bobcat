@@ -11,6 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
+  obstacle_detector
 )
 
 ## System dependencies are found with CMake's conventions
@@ -46,12 +47,13 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * uncomment the generate_messages entry below
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
-## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
-#   Message1.msg
-#   Message2.msg
-# )
+# Generate messages in the 'msg' folder
+add_message_files(
+   FILES
+   Obstacles.msg
+   CircleObstacle.msg
+   SegmentObstacle.msg
+)
 
 ## Generate services in the 'srv' folder
 # add_service_files(
