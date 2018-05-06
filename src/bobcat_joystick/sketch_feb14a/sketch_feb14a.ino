@@ -15,8 +15,8 @@
 
 /*
  * To get this running you need to start a roscore and run 
- * rosrun rosserial_python serial_node.py /dev/ttyACM0
- * replace ttyACM0 with the name of your device 
+ * rosrun rosserial_python serial_node.py /dev/ttyUSB1
+ * replace ttyUSB1 with the name of your device 
 */
 #if defined(ARDUINO) && ARDUINO >= 100
   #include "Arduino.h"
@@ -69,8 +69,8 @@ void esc_cb( const std_msgs::Float64& cmd_msg){
 }
 
 
-ros::Subscriber<std_msgs::Float64> sub("/bobcat/statemachine_steer/command", steering_cb);
-ros::Subscriber<std_msgs::Float64> sub2("/bobcat/statemachine_speed/command", esc_cb);
+ros::Subscriber<std_msgs::Float64> sub("/bobcat/ackermann_steer/command", steering_cb);
+ros::Subscriber<std_msgs::Float64> sub2("/bobcat/ackermann_speed/command", esc_cb);
 
 void setup(){
   pinMode(13, OUTPUT);
@@ -80,7 +80,7 @@ void setup(){
   nh.subscribe(sub2);
   
   steering.attach(9); //attach it to pin 9
-  motor.attach(10);
+  motor.attach(10); //attach it to pin 10
   input_timeout = 0;
   max_input_timeout = 150;
 }
