@@ -8,6 +8,7 @@ import sys
 import math
 from obstacle_detector.msg import Obstacles as obs
 from bobcat_cone_classificator.msg import Obstacles_ext as obs_ext
+from geometry_msgs.msg import Point
 
 class Camera_view():
 	def __init__(self):
@@ -20,7 +21,6 @@ class Camera_view():
 		rospy.Subscriber("/raw_obstacles",obs,self.callbackObstacle)
 		#rospy.Subscriber("/camera/depth/image",Image,self.callbackDepth)
 		self.publish_obs_ext = rospy.Publisher("/bobcat/classified_cones", obs_ext, queue_size=1)
-		
 		self.temp = obs_ext()
 
 		self.img_sliced = np.ones((1,640,3))
@@ -35,11 +35,13 @@ class Camera_view():
 		self.threshold = 50 # between 0 and 100
 
 		self.color_left = 120
-		self.color_right = 90
+		self.color_right = 0
 
 	def callbackObstacle(self,obstacles):
 		self.temp = obs_ext()
-		print("obstacles", len(obstacles.circles))
+		self.temp.left_cones = []
+		self.temp.right_cones = []
+		#print("obstacles", len(obstacles.circles))
 		objects = obstacles.circles
 		self.x_vals = []		
 		for i in range(0,len(objects)):
@@ -73,7 +75,7 @@ class Camera_view():
 		#cv2.waitKey(1)
 
 	def color(self,objects):
-		print(self.x_vals)
+		#print(self.x_vals)
 		for i in range(0,len(self.x_vals)):
 			#print('object ',i)
 			#print(self.img_sliced[0,int(self.x_vals[i])])
@@ -84,17 +86,18 @@ class Camera_view():
 			color_np = np.expand_dims(color_np,axis=0)
 			l_or_r = self.classify_color(color_np)
 			if l_or_r == 1:
-				self.temp.left_cones.append(objects[i])
+				self.temp.left_cones.append(objects[i].center)
 			elif l_or_r == 2:
-				self.temp.right_cones.append(objects[i])
+				self.temp.right_cones.append(objects[i].center)
 			#print('color', color)
-		print("pub",self.temp)
+		#print("pub",self.temp)
 		self.publish_obs_ext.publish(self.temp)
-		rgb_slice = np.repeat(self.img_sliced,40,axis=0)
+		#self.publish_test.publish(Point(1,2,3))
+		#rgb_slice = np.repeat(self.img_sliced,40,axis=0)
 		#self.canny()
 		#print(self.img_sliced.shape)
-		cv2.imshow('Image',rgb_slice)
-		cv2.waitKey(1)
+		#cv2.imshow('Image',rgb_slice)
+		#cv2.waitKey(1)
 
 	def classify_color(self,color):
 		#print("shape",self.img_sliced.shape)
