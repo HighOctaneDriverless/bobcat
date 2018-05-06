@@ -7,6 +7,7 @@ import numpy as np
 import sys
 import math
 from obstacle_detector.msg import Obstacles as obs
+from bobcat_cone_classificator.msg import Obstacles_ext as obs_ext
 
 class Camera_view():
 	def __init__(self):
@@ -29,6 +30,8 @@ class Camera_view():
 		self.ratio = 3
 		self.kernel_size = 3
 		self.threshold = 50 # between 0 and 100
+
+		color_left = 
 
 	def callbackObstacle(self,obstacles):
 		print("obstacles", len(obstacles.circles))
