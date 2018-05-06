@@ -14,6 +14,12 @@ class PubMpcControl():
 		self.N = 0
 		self.dt = 0.05
 		self.control_vec = [0,0]
+		#init publisher
+		pubAckermannSpeed = rospy.Publisher("/bobcat/ackermann_speed/command", Float64, queue_size=1)
+		pubAckermannSteer = rospy.Publisher("/bobcat/ackermann_steer/command", Float64, queue_size=1)
+
+		#init subscriber
+		rospy.Subscriber("/bobcat/mpc_control_vec", MPCControlVec, self.callback_mpc_control_vec)
 
 	def callback_mpc_control_vec(self, data):
 		self.N = data.N
@@ -28,12 +34,7 @@ class PubMpcControl():
 		rospy.init_node('bobcat_pub_mpc_control', anonymous = True)
 		rospy.loginfo("PubMPCControl started")
 
-		#init publisher
-		pubAckermannSpeed = rospy.Publisher("/bobcat/ackermann_speed/command", Float64, queue_size=1)
-		pubAckermannSteer = rospy.Publisher("/bobcat/ackermann_steer/command", Float64, queue_size=1)
 
-		#init subscriber
-		rospy.Subscriber("/bobcat/mpc_control_vec", MPCControlVec, self.callback_mpc_control_vec)
 
 
 	    	rate = rospy.Rate(20) # 20hz    	
@@ -49,8 +50,6 @@ class PubMpcControl():
 			rate.sleep()
 
 
-
-	
 
 	
 
