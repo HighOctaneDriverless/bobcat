@@ -1,3 +1,4 @@
 Header header
 
-bobcat_cone_classificator/CircleObstacle_ext[] circles
+bobcat_cone_classificator/CircleObstacle_ext[] left_cones
+bobcat_cone_classificator/CircleObstacle_ext[] right_cones

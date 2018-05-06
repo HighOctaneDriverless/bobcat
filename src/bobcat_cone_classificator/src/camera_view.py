@@ -19,21 +19,26 @@ class Camera_view():
 		self.image = np.zeros((480,640,3))
 		rospy.Subscriber("/raw_obstacles",obs,self.callbackObstacle)
 		#rospy.Subscriber("/camera/depth/image",Image,self.callbackDepth)
+		self.publish_obs_ext = rospy.Publisher("/bobcat/classified_cones", obs_ext, queue_size=1)
 		
+		self.temp = obs_ext()
+
 		self.img_sliced = np.ones((1,640,3))
 		#images
 		#self.rgb_slice = np.zeros((40,640,3))
 		#self.d_slice = np.zeros((40,640,1))
-
+		
 		self.x_vals = []
 		#canny parameters
 		self.ratio = 3
 		self.kernel_size = 3
 		self.threshold = 50 # between 0 and 100
 
-		#color_left = 
+		self.color_left = 120
+		self.color_right = 90
 
 	def callbackObstacle(self,obstacles):
+		self.temp = obs_ext()
 		print("obstacles", len(obstacles.circles))
 		objects = obstacles.circles
 		self.x_vals = []		
@@ -50,7 +55,7 @@ class Camera_view():
 			#print("pixel", self.x_vals[i])			
 			#print('angel '+str(i),degree)
 			#print('rad' +str(i),rad)
-		self.color()
+		self.color(objects)
 		
 
 	def callbackRGB(self,image):
@@ -67,18 +72,41 @@ class Camera_view():
 		#cv2.imshow('Image',rgb_slice)
 		#cv2.waitKey(1)
 
-	def color(self):
+	def color(self,objects):
 		print(self.x_vals)
 		for i in range(0,len(self.x_vals)):
-			print('object ',i)
-			print(self.img_sliced[0,int(self.x_vals[i])])
+			#print('object ',i)
+			#print(self.img_sliced[0,int(self.x_vals[i])])
 			color = self.img_sliced[0,int(self.x_vals[i]),:]
-			print('color', color)
+			#color = np.uint8(color)/255.0
+			color_np = np.array(color)
+			color_np = np.expand_dims(color_np,axis=0)
+			color_np = np.expand_dims(color_np,axis=0)
+			l_or_r = self.classify_color(color_np)
+			if l_or_r == 1:
+				self.temp.left_cones.append(objects[i])
+			elif l_or_r == 2:
+				self.temp.right_cones.append(objects[i])
+			#print('color', color)
+		print("pub",self.temp)
+		self.publish_obs_ext.publish(self.temp)
 		rgb_slice = np.repeat(self.img_sliced,40,axis=0)
 		#self.canny()
 		#print(self.img_sliced.shape)
 		cv2.imshow('Image',rgb_slice)
 		cv2.waitKey(1)
+
+	def classify_color(self,color):
+		#print("shape",self.img_sliced.shape)
+		hsv = cv2.cvtColor(color, cv2.COLOR_BGR2HSV)
+		#print("hsv",hsv[0,0,0])
+		h = hsv[0,0,0]
+		if abs(h-self.color_left)<10:
+			#print("left")
+			return 1
+		elif abs(h-self.color_right)<15:
+			#print("right")			
+			return 2
 
 	def callbackDepth(self,image):
 		np_arr = np.fromstring(image.data, np.float32)
@@ -110,6 +138,7 @@ class Camera_view():
 		cv2.waitKey(1)
 		#cv2.imshow(self.image)
 		#cv2.imwrite("")
+		
 	
 	def write(self):
 		try:
