@@ -31,7 +31,7 @@ class Camera_view():
 		self.kernel_size = 3
 		self.threshold = 50 # between 0 and 100
 
-		color_left = 
+		#color_left = 
 
 	def callbackObstacle(self,obstacles):
 		print("obstacles", len(obstacles.circles))
@@ -68,9 +68,11 @@ class Camera_view():
 		#cv2.waitKey(1)
 
 	def color(self):
+		print(self.x_vals)
 		for i in range(0,len(self.x_vals)):
 			print('object ',i)
-			color = self.img_sliced[0,self.x_vals[i],:]
+			print(self.img_sliced[0,int(self.x_vals[i])])
+			color = self.img_sliced[0,int(self.x_vals[i]),:]
 			print('color', color)
 		rgb_slice = np.repeat(self.img_sliced,40,axis=0)
 		#self.canny()
