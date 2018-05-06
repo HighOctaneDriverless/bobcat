@@ -1,4 +1,2 @@
-Header header
-
-bobcat_cone_classificator/CircleObstacle_ext[] left_cones
-bobcat_cone_classificator/CircleObstacle_ext[] right_cones
+geometry_msgs/Point[] left_cones
+geometry_msgs/Point[] right_cones

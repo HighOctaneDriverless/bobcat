@@ -8,7 +8,7 @@ from nav_msgs.msg import Odometry
 from std_msgs.msg import Float64
 from scipy.optimize import minimize
 from scipy import interpolate
-from geometry_msgs.msg import Pose
+from geometry_msgs.msg import Point
 from bobcat_mpc.msg import MPCControlVec
 
 #Vehicle Parameter for rc-car
@@ -117,10 +117,10 @@ def main():
 			running = False
         	rate.sleep()
 
-def callback_goal_pose(data):
+def callback_goal_point(data):
 	running = True
-	goalPoint[0] = data.position.x
-	goalPoint[1] = data.position.y
+	goalPoint[0] = data.x
+	goalPoint[1] = data.y
 
 	
 	
@@ -129,7 +129,7 @@ def callback_goal_pose(data):
 pubMPCControlVec = rospy.Publisher("/bobcat/mpc_control_vec", MPCControlVec, queue_size=1)
 
 #init subscriber
-rospy.Subscriber("/bobcat/goalPose", Pose, callback_goal_pose)
+rospy.Subscriber("/bobcat/goalPose", Point, callback_goal_point)
 
 
 #init bnds
