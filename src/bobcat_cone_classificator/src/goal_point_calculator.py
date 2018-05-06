@@ -16,8 +16,10 @@ class Goal_point_calculator():
 
 
 	def callback_cones(self, data):
-		left_poles = data.left_poles
-		right_poles = data.right_poles
+		left_poles = data.left_cones
+		right_poles = data.right_cones
+		if len(left_poles <= 0) or len(right_poles <= 0):
+			return
 		indx_r = 0
 		indx_l = 0
 		smallest = 1000
