@@ -24,6 +24,11 @@
   #include <WProgram.h>
 #endif
 
+#if defined(USE_USBCON)
+  // Arduino Leonardo USB Serial Port
+  #define SERIAL_CLASS Serial_
+#endif
+
 #include <Servo.h> 
 #include <ros.h>
 #include <std_msgs/UInt16.h>
