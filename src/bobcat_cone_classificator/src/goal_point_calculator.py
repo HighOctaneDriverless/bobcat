@@ -4,6 +4,7 @@ import rospy
 from geometry_msgs.msg import Pose
 from bobcat_cone_classificator.msg import Obstacles_ext as Obst
 from geometry_msgs.msg import Point
+from std_msgs.msg import Float64
 
 class Goal_point_calculator():
 
@@ -14,6 +15,10 @@ class Goal_point_calculator():
 		rospy.Subscriber("/bobcat/classified_cones", Obst, self.callback_cones)
 		#init publisher
 		self.pubGoalPose = rospy.Publisher("/bobcat/goalPose", Point, queue_size=1)
+		
+		#just for testing		
+		self.pubAckermannSpeed = rospy.Publisher("/bobcat/ackermann_speed/command", Float64, queue_size=1)
+		self.pubAckermannSteer = rospy.Publisher("/bobcat/ackermann_steer/command", Float64, queue_size=1)
 
 
 	def callback_cones(self, data):
@@ -40,14 +45,21 @@ class Goal_point_calculator():
 		self.computeGoalPoint(left_poles[indx_l], right_poles[indx_r])
 
 
+
 	def computeGoalPoint(self, left_pole, right_pole):
 		x = (left_pole.x  + right_pole.x)/2.0			
 		y = (left_pole.y  + right_pole.y)/2.0
 		
 		newPoint = Point(x,y,0)
 		self.pubGoalPose.publish(newPoint)
+		self.computeConotrolValues(x,y)
 
-
+	def computeControlValues(self, x ,y):
+		dist = math.sqrt(x**2 + y**2)
+		speed = p_speed * dist
+		steer = p_steer * y
+		self.pubAckermannSpeed.publish(speed)
+		self.pubAckermannSteer.publish(steer)
 
 
 if __name__ == '__main__':
