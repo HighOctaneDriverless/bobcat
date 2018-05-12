@@ -5,6 +5,8 @@ from geometry_msgs.msg import Pose
 from bobcat_cone_classificator.msg import Obstacles_ext as Obst
 from geometry_msgs.msg import Point
 from std_msgs.msg import Float64
+import math
+
 
 class Goal_point_calculator():
 
@@ -19,6 +21,11 @@ class Goal_point_calculator():
 		#just for testing		
 		self.pubAckermannSpeed = rospy.Publisher("/bobcat/ackermann_speed/command", Float64, queue_size=1)
 		self.pubAckermannSteer = rospy.Publisher("/bobcat/ackermann_steer/command", Float64, queue_size=1)
+
+		median_length = 10
+		self.steer_median = []
+		for i in range(0,median_length):
+			self.steer_median.append(0.0)
 
 
 	def callback_cones(self, data):
@@ -41,9 +48,25 @@ class Goal_point_calculator():
 			if(dist < smallest):
 				smallest = dist
 				indx_l = i
-		print("left_pole", left_poles[indx_l])
+		#print("left_pole", left_poles[indx_l])
 		self.computeGoalPoint(left_poles[indx_l], right_poles[indx_r])
 
+	def computeControlValues(self, x ,y):
+		offset = 0.2
+		y = y + offset
+		p_speed = 1.3
+		p_steer = 1.1
+		dist = math.sqrt(x**2 + y**2)
+		speed = p_speed * dist
+		steer = p_steer * y
+		self.steer_median.pop(0)
+		self.steer_median.append(steer)
+		print("median",self.steer_median)
+		steer = sum(self.steer_median) / len(self.steer_median)
+		print("\n speed", speed)
+		print("\n\n steer", steer)
+		self.pubAckermannSpeed.publish(speed)
+		self.pubAckermannSteer.publish(steer)
 
 
 	def computeGoalPoint(self, left_pole, right_pole):
@@ -52,7 +75,8 @@ class Goal_point_calculator():
 		
 		newPoint = Point(x,y,0)
 		self.pubGoalPose.publish(newPoint)
-		self.computeConotrolValues(x,y)
+		self.computeControlValues(x,y)
+
 
 	def computeControlValues(self, x ,y):
 		dist = math.sqrt(x**2 + y**2)

@@ -34,8 +34,8 @@ class Camera_view():
 		self.kernel_size = 3
 		self.threshold = 50 # between 0 and 100
 
-		self.color_left = 120
-		self.color_right = 0
+		self.color_left = 110
+		self.color_right = 160
 
 	def callbackObstacle(self,obstacles):
 		self.temp = obs_ext()
@@ -53,7 +53,7 @@ class Camera_view():
 				self.x_vals.append((640-295)/29*(90-abs(degree))+295)
 			#print(self.image_sliced)
 			#color = self.image_sliced[0,x_val,:]
-			#print('color', color) 
+			#print('color',color) 
 			#print("pixel", self.x_vals[i])			
 			#print('angel '+str(i),degree)
 			#print('rad' +str(i),rad)
@@ -88,8 +88,28 @@ class Camera_view():
 			if l_or_r == 1:
 				self.temp.left_cones.append(objects[i].center)
 			elif l_or_r == 2:
-				self.temp.right_cones.append(objects[i].center)
+				pass
+				#self.temp.right_cones.append(objects[i].center)
 			#print('color', color)
+		if len(self.temp.right_cones) == 0 and len(self.temp.left_cones) == 0:
+			return
+		if len(self.temp.right_cones) == 0:
+				print("right added")
+				virtual_right_cone = Point(0,0,0)
+				virtual_right_cone.x = self.temp.left_cones[0].x
+				virtual_right_cone.y = self.temp.left_cones[0].y - 1.0	
+				self.temp.right_cones.append(virtual_right_cone)
+		if len(self.temp.left_cones) == 0:
+				print("left added")
+				virtual_left_cone = Point(0,0,0)
+				virtual_left_cone.x = self.temp.right_cones[0].x
+				virtual_left_cone.y = self.temp.right_cones[0].y + 1.0
+				self.temp.left_cones.append(virtual_left_cone)
+		print("LEFT:",self.temp.left_cones)
+		print("RIGHT:",self.temp.right_cones)
+		print("\n\n")
+		#print("len right",len(self.temp.right_cones))
+		#print("len left",len(self.temp.left_cones))
 		#print("pub",self.temp)
 		self.publish_obs_ext.publish(self.temp)
 		#self.publish_test.publish(Point(1,2,3))
@@ -101,16 +121,24 @@ class Camera_view():
 
 	def classify_color(self,color):
 		#print("shape",self.img_sliced.shape)
-		hsv = cv2.cvtColor(color, cv2.COLOR_BGR2HSV)
-		#print("hsv",hsv[0,0,0])
-		h = hsv[0,0,0]
-		if abs(h-self.color_left)<10:
+		#hsv = cv2.cvtColor(color, cv2.COLOR_BGR2HSV)
+		#CHECK COLORS
+		#print("hsv_test",color[0,0,:])
+		#h = hsv[0,0,0]
+		b = color[0,0,0]
+		r = color[0,0,2]
+		if b > 60 and r < 50:
+			return 1
+		else:
+			return 2
+		'''if abs(h-self.color_left)<10:
 			#print("left")
 			return 1
-		elif abs(h-self.color_right)<15:
+		else:		
+		#elif abs(h-self.color_right)<15:
 			#print("right")			
 			return 2
-
+'''
 	def callbackDepth(self,image):
 		np_arr = np.fromstring(image.data, np.float32)
 		#print(str(np_arr.shape))
