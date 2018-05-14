@@ -7,7 +7,7 @@ import numpy as np
 import sys
 import math
 from skimage.transform import resize 
-import skimage
+from skimage import img_as_ubyte
 #from obstacle_detector.msg import Obstacles as obs
 #from bobcat_cone_classificator.msg import Obstacles_ext as obs_ext
 #from geometry_msgs.msg import Point
@@ -33,11 +33,13 @@ class Camera_view():
 
 		#resize to (240,320,3)
 		img_resized = resize(img_reshaped,(240,320))
+		img_resized = img_as_ubyte(img_resized)
+		
 
 		#crop to (96,320,3)
 		self.img_cropped = img_resized[143:239,0:320,:3]
 
-		self.show(self.img_cropped)	
+		#self.show(self.img_cropped)	
 			
 	
 	def show(self,img):
@@ -49,7 +51,8 @@ class Camera_view():
 
 	def publish(self):
 		img_pub = Image()
-		img_pub.data = self.img_cropped
+		#self.show(self.img_cropped)
+		img_pub.data = self.img_cropped.flatten().tolist()
 		self.publish_img.publish(img_pub)
 
 def main():
