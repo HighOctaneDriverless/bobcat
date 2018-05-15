@@ -2,12 +2,11 @@
 
 import rospy
 from sensor_msgs.msg import Image
-import cv2
 import numpy as np
 import sys
 import math
 from skimage.transform import resize 
-#import skimage
+from skimage import img_as_ubyte
 from geometry_msgs.msg import Point
 from keras import models
 from.optimizers import SGD
@@ -20,6 +19,7 @@ class Camera_view():
 		img_w = 320
 		channels = 3		
 		n_labels = 3
+		path_pic = "/home/martin2/Documents/Data/saved/models/"
 
 		#init ros_node
         	rospy.init_node('roboevent_station', anonymous=True)
@@ -61,6 +61,7 @@ class Camera_view():
 		#PREDICT 
 		prediction = self.model.predict(image,verbose=0)
 		prediction = prediction.reshape((prediction.shape[0],out_h,out_w,n_labels))
+		result = img_as_ubyte(prediction[0,;,;,1])
 		
 		#PRINT PREDICTION
 		self.show(prediction[0])

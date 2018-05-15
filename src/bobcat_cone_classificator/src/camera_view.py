@@ -73,7 +73,6 @@ class Camera_view():
 		#print(self.img_sliced.shape)
 		#cv2.imshow('Image',rgb_slice)
 		#cv2.waitKey(1)
-
 	def color(self,objects):
 		#print(self.x_vals)
 		for i in range(0,len(self.x_vals)):
@@ -84,26 +83,33 @@ class Camera_view():
 			color_np = np.array(color)
 			color_np = np.expand_dims(color_np,axis=0)
 			color_np = np.expand_dims(color_np,axis=0)
+			
 			l_or_r = self.classify_color(color_np)
 			if l_or_r == 1:
+				print("Left: color", color_np)
 				self.temp.left_cones.append(objects[i].center)
+				#pass
 			elif l_or_r == 2:
-				pass
-				#self.temp.right_cones.append(objects[i].center)
+				print("Right: color", color_np)
+				self.temp.right_cones.append(objects[i].center)
+				#pass
+			else:
+				print("ELSE: color", color_np)
 			#print('color', color)
+
 		if len(self.temp.right_cones) == 0 and len(self.temp.left_cones) == 0:
 			return
 		if len(self.temp.right_cones) == 0:
 				print("right added")
 				virtual_right_cone = Point(0,0,0)
-				virtual_right_cone.x = self.temp.left_cones[0].x
-				virtual_right_cone.y = self.temp.left_cones[0].y - 1.0	
+				virtual_right_cone.x = self.temp.left_cones[len(self.temp.left_cones)-1].x
+				virtual_right_cone.y = self.temp.left_cones[len(self.temp.left_cones)-1].y - 1.0	
 				self.temp.right_cones.append(virtual_right_cone)
 		if len(self.temp.left_cones) == 0:
 				print("left added")
 				virtual_left_cone = Point(0,0,0)
-				virtual_left_cone.x = self.temp.right_cones[0].x
-				virtual_left_cone.y = self.temp.right_cones[0].y + 1.0
+				virtual_left_cone.x = self.temp.right_cones[len(self.temp.right_cones)-1].x
+				virtual_left_cone.y = self.temp.right_cones[len(self.temp.right_cones)-1].y + 1.0
 				self.temp.left_cones.append(virtual_left_cone)
 		print("LEFT:",self.temp.left_cones)
 		print("RIGHT:",self.temp.right_cones)
@@ -126,10 +132,11 @@ class Camera_view():
 		#print("hsv_test",color[0,0,:])
 		#h = hsv[0,0,0]
 		b = color[0,0,0]
+		g = color[0,0,1]
 		r = color[0,0,2]
-		if b > 60 and r < 50:
+		if b > 30 and g < 100 and r < 100:
 			return 1
-		else:
+		elif b < 30 and g > 50 and r > 100:
 			return 2
 		'''if abs(h-self.color_left)<10:
 			#print("left")

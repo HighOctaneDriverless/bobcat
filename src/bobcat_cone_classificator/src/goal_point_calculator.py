@@ -49,12 +49,13 @@ class Goal_point_calculator():
 				smallest = dist
 				indx_l = i
 		#print("left_pole", left_poles[indx_l])
+		#self.computeGoalPoint(left_poles[indx_l], right_poles[indx_r])
 		self.computeGoalPoint(left_poles[indx_l], right_poles[indx_r])
 
 	def computeControlValues(self, x ,y):
 		offset = 0.2
 		y = y + offset
-		p_speed = 1.3
+		p_speed = 3.0
 		p_steer = 1.1
 		dist = math.sqrt(x**2 + y**2)
 		speed = p_speed * dist
@@ -78,12 +79,6 @@ class Goal_point_calculator():
 		self.computeControlValues(x,y)
 
 
-	def computeControlValues(self, x ,y):
-		dist = math.sqrt(x**2 + y**2)
-		speed = p_speed * dist
-		steer = p_steer * y
-		self.pubAckermannSpeed.publish(speed)
-		self.pubAckermannSteer.publish(steer)
 
 
 if __name__ == '__main__':
