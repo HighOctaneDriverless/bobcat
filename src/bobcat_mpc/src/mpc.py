@@ -10,6 +10,8 @@ from scipy.optimize import minimize
 from scipy import interpolate
 from geometry_msgs.msg import Point
 from bobcat_mpc.msg import MPCControlVec
+from scipy import interpolate
+
 
 class MPC():
 
@@ -37,6 +39,9 @@ class MPC():
 		self.goalPoint = [1.0,0.0]
 		self.X0 = np.zeros(6*(self.N+1)) 
 		self.running = False
+
+		#track data 
+		self.tck	#if track is represented as a b_spline its parameter are stored in t, c, k
 
 
 	def get_bounds(self):
@@ -72,12 +77,53 @@ class MPC():
 		if(Xnext[2] > self.max_speed): Xnext[2] = self.max_speed
 		return Xnext
 
+	#this cost function tries to minimize the distance to the cheese point
 	def cost_func(self, X):
 		x = X[-6]
 		y = X[-5]   
 		dist = math.fabs(np.sqrt((x - self.goalPoint[0])**2 + (y - self.goalPoint[1])**2))
 	   	#print("dist", dist)
 		return dist
+
+	#this cost function tries to minimize the distance to the chees point while staying on the
+	#track. This is done by a softconstraint for the distance from the track center
+	def cost_func(self, X):
+		a = 1 # use this variable to adjust cost for distance to cheese point		
+		b = 1 # use this variable to adjust cost for soft constraint
+		x = X[-6]
+		y = X[-5]   
+		dist_cheese = math.fabs(np.sqrt((x - self.goalPoint[0])**2 + (y - self.goalPoint[1])**2))
+				   	
+		N = x.size/6 -1
+		dist_midTrack = 0
+		for i in range(0, N, 1):
+			dist_midTrack += self.getTrackDist([X[6*i], X[6*1 + 1]])
+	
+		dist = dist_cheese * a + dist_midTrack * b
+		#print("dist", dist)	
+		return dist
+
+	#calculates the distance of any point from the center of the track which is given as a b-spline 
+	def getTrackDist(self, pos):
+	        ti = np.linspace(0,1, 50)	
+	        x,y = interpolate.splev(ti, self.tck[0], der=0)
+	        indx = 0
+        	smallest = float("inf")       
+	        for i in range (0, 50, 1):
+	            dist = math.sqrt((x[i] - pos[0])**2 + (y[i] - pos[1])**2) 
+        	    if dist < smallest:
+        	        smallest = dist
+       	         	indx = i
+
+		# self.arc_pos = indx/50.0
+
+		p1 = np.array([x[indx], y[indx]])
+		p2 = np.array([x[indx + 1], y[indx +1]])
+		p3 = np.array([pos[0], pos[1]])
+		
+		#calculate the "lot" 
+		dist = math.fabs(np.cross(p2-p1, p3-p1)/np.linalg.norm(p2-p1))
+       	 	return dist
 
 
 	def get_cons(self):
@@ -128,7 +174,15 @@ class MPC():
 		self.goalPoint[0] = data.x
 		self.goalPoint[1] = data.y
 
-	
+	def callback_goal_track_spline(self, data):
+		#print("received data")
+		self.running = True
+		self.tck = data.tck		
+
+
+	#as soon as a vehicle odom is running subscribe to the data and incooperate it
+	def callback_vehicle_parameter(self, data):
+		self.odom = data.odom	#this is just a placeholder				
 
 
 # Main function.
