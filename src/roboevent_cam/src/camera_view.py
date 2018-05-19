@@ -18,6 +18,8 @@ class Camera_view():
         	rospy.init_node('roboevent_cam', anonymous=True)
 		self.iteration = 0
 
+		self.moveUp = 0 #max 143
+
 		rospy.Subscriber("/camera/rgb/image_raw",Image,self.callbackRGB)
 		self.img_to_save = False
 		self.publish_img = rospy.Publisher("/bobcat/roboevent_cam", Image, queue_size=1)
@@ -35,10 +37,15 @@ class Camera_view():
 		#resize to (240,320,3)
 		img_resized = resize(img_reshaped,(240,320))
 		img_resized = img_as_ubyte(img_resized)
+
+		#print("img_to save",self.img_to_save)
+		if self.img_to_save == True:
+			#print("test")
+			self.savePicture(img_resized)
 		
 
 		#crop to (96,320,3)
-		img_cropped = img_resized[143:239,0:320,:3]
+		img_cropped = img_resized[143-self.moveUp:239-self.moveUp,0:320,:3]
 
 		#noise
 		img_cropped = util.random_noise(img_cropped,var=0)
@@ -47,13 +54,6 @@ class Camera_view():
 		
 		#img_cropped = np.expand_dims(img_cropped, axis=2)
 		#print("shape",img_cropped.shape)
-
-
-		#print("img_to save",self.img_to_save)
-		if self.img_to_save == True:
-			#print("test")
-			self.savePicture(img_cropped)	
-
 		
 		self.publish(img_cropped)
 		#self.show(img_cropped)
