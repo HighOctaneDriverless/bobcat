@@ -28,8 +28,8 @@ Servo motor;
 int input_timeout = 6;
 int max_input_timeout = 5;
 //set max_pwm values to prevent car from going "berserker"
-const int max_forward_pwm = 35;
-const int max_backward_pwm = 25;
+const int max_forward_pwm = 17;
+const int max_backward_pwm = 17;
 
 
 const int  wheel_encoder_ticks = 61;  //ticks counted for one wheel turn
@@ -49,15 +49,17 @@ const int array_size = 20;  // size of
 float distance_buffer [array_size] = {0};
 
 //values for pid controller
-const float windeup_threshold = 0.05;
+const float windeup_threshold = 0.02;
 const float integral_max_threshold = 20;
 float speed_integral = 0;
 
 //values from ros
 float desired_speed = 0;
 
-std_msgs::Float64 temp_msg;
-ros::Publisher pub("/bobcat/speed", &temp_msg);
+std_msgs::Float64 speed_msg;
+ros::Publisher pub_speed("/bobcat/speed", &speed_msg);
+std_msgs::Float64 dist_msg;
+ros::Publisher pub_dist("/bobcat/distance", &dist_msg);
 
 void setup()
 {
@@ -68,8 +70,9 @@ void setup()
   nh.initNode();
   nh.subscribe(sub);
   nh.subscribe(sub2);
-  nh.advertise(pub);
-  
+  nh.advertise(pub_speed);
+  nh.advertise(pub_dist);
+    
   nh.loginfo("Arduino speed_control setup");
   
 
@@ -120,8 +123,8 @@ float compute_speed(){
 
 //pid controller that takes the desired speed beeing published by ros and computes the output value going to the pwm controller of the motor
 float speed_pid_controller(){
-  float p_speed = 25;
-  float i_speed = 3;
+  float p_speed = 60;
+  float i_speed = 4;
   float d_speed = 0;
   float speed_diff = desired_speed - x_d;
   speed_integral += speed_diff;
@@ -187,21 +190,11 @@ void loop()
   float motor_control = speed_pid_controller();
   control_motor_esc(motor_control);
 
-  //unsigned long CurrentTime = micros();14
-  //unsigned long ElapsedTime = CurrentTime - StartTime;
-  //nh.loginfo("Distance traveled: ");
-  //nh.loginfo(int(distance_traveled));
-  //nh.loginfo("Speed in cm/s: ");
-  //nh.loginfo(int(x_d * 100));
-  //nh.loginfo("Desired Speed in cm/s: ");
-  //nh.loginfo(int(desired_speed * 100));
-  //String test = "Motor_control";
-  //test += motor_control;
-  //char buff[40];
-  //test.toCharArray(buff, test.length());
-  //nh.loginfo(buff);
-  temp_msg.data = x_d;
-  pub.publish(&temp_msg);
+  speed_msg.data = x_d;
+  pub_speed.publish(&speed_msg);
+  dist_msg.data = distance_traveled;
+  pub_dist.publish(&dist_msg);
+  
   //increase input_timeout for speed 
   input_timeout = input_timeout + 1;
   delay(50);    // run code every 50ms or 20 times per second
