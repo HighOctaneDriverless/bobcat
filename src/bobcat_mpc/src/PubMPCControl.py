@@ -54,9 +54,10 @@ class PubMpcControl():
 
 	    	rate = rospy.Rate(10) # 20hz    	
 	    	while not rospy.is_shutdown():
+			p_speed = 1.7
 			if(self.counter < self.N):
-				self.pubAckermannSpeed.publish(self.control_vec[self.counter*2 +0])
-				self.pubAckermannSteer.publish(self.control_vec[self.counter*2 +1])				
+				self.pubAckermannSpeed.publish(self.control_vec[self.counter*2 +0] * p_speed)
+				self.pubAckermannSteer.publish(self.control_vec[self.counter*2 +1])		 		
 				#self.fpubPWMSignalToArduino(self.control_vec[self.counter*2 + 0], self.control_vec[self.counter*2 + 1])
 				self.counter += 1
 			else:

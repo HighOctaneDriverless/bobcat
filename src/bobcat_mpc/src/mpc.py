@@ -116,7 +116,6 @@ class MPC():
        	         	indx = i
 
 		# self.arc_pos = indx/50.0
-
 		p1 = np.array([x[indx], y[indx]])
 		p2 = np.array([x[indx + 1], y[indx +1]])
 		p3 = np.array([pos[0], pos[1]])
