@@ -1,3 +1,9 @@
+/*
+ * To get this running you need to start a roscore and run 
+ * rosrun rosserial_python serial_node.py /dev/ttyUSB1
+ * replace ttyUSB1 with the name of your device 
+*/
+
 #if defined(ARDUINO) && ARDUINO >= 100
   #include "Arduino.h"
 #else
@@ -26,8 +32,8 @@ const int max_forward_pwm = 35;
 const int max_backward_pwm = 25;
 
 
-const int  wheel_encoder_ticks = 30;  //ticks counted for one wheel turn
-const float wheel_circumference = 0.3; //in m
+const int  wheel_encoder_ticks = 61;  //ticks counted for one wheel turn
+const float wheel_circumference = 0.335; //in m
 const float dist_per_tick = wheel_circumference / wheel_encoder_ticks; //travelled distance per tick
 
 const byte interruptPin1 = 2;
@@ -44,25 +50,28 @@ float distance_buffer [array_size] = {0};
 
 //values for pid controller
 const float windeup_threshold = 0.05;
-const float integral_max_threshold = 10;
+const float integral_max_threshold = 20;
 float speed_integral = 0;
 
 //values from ros
 float desired_speed = 0;
 
-
+std_msgs::Float64 temp_msg;
+ros::Publisher pub("/bobcat/speed", &temp_msg);
 
 void setup()
 {
-
-  
   // ros stuff
   ros::Subscriber<std_msgs::Float64> sub("/bobcat/ackermann_steer/command", steering_cb);
   ros::Subscriber<std_msgs::Float64> sub2("/bobcat/ackermann_speed/command", speed_cb);
-
+  
   nh.initNode();
   nh.subscribe(sub);
   nh.subscribe(sub2);
+  nh.advertise(pub);
+  
+  nh.loginfo("Arduino speed_control setup");
+  
 
   //servo and motor controller
   steering.attach(9); //attach it to pin 9
@@ -71,7 +80,6 @@ void setup()
   //intterrupts to detect the wheel encoder ticks
   attachInterrupt(digitalPinToInterrupt(interruptPin1), count_detected_left, FALLING);
   attachInterrupt(digitalPinToInterrupt(interruptPin2), count_detected_right, FALLING);
-  Serial.begin(9600); 
 
 }
 
@@ -94,26 +102,26 @@ float compute_distance(){
 
 //shifts the array one element to the right and updates for index 0 the newest value
 void add_value_to_array(float distance_new){
-  for(int i = array_size; i >=  1; i--){
-    distance_buffer[i - 1] = distance_buffer[i];
+  for(int i = array_size -1; i >=  1; i--){
+    distance_buffer[i] = distance_buffer[i - 1];
   }
   distance_buffer[0] = distance_new;
 }
 
-//this only works if i get the loop to run at exactly 20hz
+//this only works if i get the loop to run at exactly 20hz or 50ms for every step
 float compute_speed(){
   //compute median over 5 time_steps (1second)
   int median = 5;
   float x_d = distance_buffer[0] - distance_buffer[median -1];
-  x_d = x_d / median; 
+  x_d = x_d / (median *0.05); 
   return x_d;   
 }
 
 
 //pid controller that takes the desired speed beeing published by ros and computes the output value going to the pwm controller of the motor
 float speed_pid_controller(){
-  float p_speed = 1;
-  float i_speed = 0;
+  float p_speed = 25;
+  float i_speed = 3;
   float d_speed = 0;
   float speed_diff = desired_speed - x_d;
   speed_integral += speed_diff;
@@ -123,6 +131,10 @@ float speed_pid_controller(){
   if(speed_integral >= integral_max_threshold){
     speed_integral = integral_max_threshold;
   }
+  if(input_timeout >=  max_input_timeout){
+    speed_integral = 0;
+  } 
+
   float motor_control = p_speed * speed_diff + i_speed * speed_integral;
   return motor_control;
 }
@@ -153,20 +165,21 @@ void control_motor_esc(float motor_control){
   if(motor_control > max_forward_pwm){
     motor_control = max_forward_pwm;
   }
-  else if(motor_control < max_backward_pwm){
-    motor_control = max_backward_pwm;
+  else if(motor_control < -max_backward_pwm){
+    motor_control = -max_backward_pwm;
   }
   if(input_timeout >=  max_input_timeout){
     motor_control = 0;
   } 
-
-  motor.write(90 + motor_control); //set servo angle, should be from 0-180  
+  motor.write(90 - motor_control); //set servo angle, should be from 0-180  
 }
 
 void loop()
 {
+  nh.spinOnce();
+  
   //measure computation time to set delay more precisely
-  unsigned long StartTime = millis();
+  //unsigned long StartTime = micros();
   
   distance_traveled = compute_distance();
   add_value_to_array(distance_traveled);
@@ -174,19 +187,21 @@ void loop()
   float motor_control = speed_pid_controller();
   control_motor_esc(motor_control);
 
-  unsigned long CurrentTime = millis();
-  unsigned long ElapsedTime = CurrentTime - StartTime;
-
-  Serial.print("    elapsed_time:    ");
-  Serial.print(ElapsedTime);
-  Serial.print("   distance_traveled:  ");
-  Serial.print(distance_traveled);
-  Serial.print("    speed:  ");
-  Serial.print(x_d);
-  Serial.print("    motor_control_pwm:   ");
-  Serial.print(motor_control);
-  
-  
+  //unsigned long CurrentTime = micros();14
+  //unsigned long ElapsedTime = CurrentTime - StartTime;
+  //nh.loginfo("Distance traveled: ");
+  //nh.loginfo(int(distance_traveled));
+  //nh.loginfo("Speed in cm/s: ");
+  //nh.loginfo(int(x_d * 100));
+  //nh.loginfo("Desired Speed in cm/s: ");
+  //nh.loginfo(int(desired_speed * 100));
+  //String test = "Motor_control";
+  //test += motor_control;
+  //char buff[40];
+  //test.toCharArray(buff, test.length());
+  //nh.loginfo(buff);
+  temp_msg.data = x_d;
+  pub.publish(&temp_msg);
   //increase input_timeout for speed 
   input_timeout = input_timeout + 1;
   delay(50);    // run code every 50ms or 20 times per second
