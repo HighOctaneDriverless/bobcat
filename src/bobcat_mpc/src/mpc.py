@@ -21,9 +21,9 @@ class MPC():
 		rospy.loginfo(rospy.get_name() + "message param is %s", init_message)
 
 		#Vehicle Parameter for rc-car
-		self.lf = 0.2    # distance front tire to COG
-		self.lr = 0.2    # distance back  tire to COG
-		self.lb = 0.3    # width of car
+		self.lf = 0.185    # distance front tire to COG
+		self.lr = 0.185    # distance back  tire to COG
+		self.lb = 0.25    # width of car
 		self.r  = 0.05   # radius wheels
 
 		self.max_speed = 1 	# for now max output for ackermann_speed
@@ -41,7 +41,7 @@ class MPC():
 		self.running = False
 
 		#track data 
-		self.tck	#if track is represented as a b_spline its parameter are stored in t, c, k
+		self.tck = 0	#if track is represented as a b_spline its parameter are stored in t, c, k
 
 
 	def get_bounds(self):

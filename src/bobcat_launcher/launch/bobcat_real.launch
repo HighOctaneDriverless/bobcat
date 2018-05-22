@@ -18,6 +18,9 @@
   <param name="range_max" value="2.0" type="double"/>
   </node>
 
+<node name= "goal_point_calculator" pkg="bobcat_cone_classificator" type="goal_point_calculator.py"/>
+<node name ="camera_view" pkg="bobcat_cone_classificator" type="camera_view.py"/>
+
   <node name="rviz" pkg="rviz" type="rviz" /> 
     
 </launch>

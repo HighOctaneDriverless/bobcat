@@ -18,6 +18,8 @@ class Camera_view():
         	rospy.init_node('roboevent_cam', anonymous=True)
 		self.iteration = 0
 
+		self.img_pub_ = np.zeros((240,320,3))
+
 		self.moveUp = 0 #max 143
 
 		rospy.Subscriber("/camera/rgb/image_raw",Image,self.callbackRGB)
@@ -55,13 +57,15 @@ class Camera_view():
 		#img_cropped = np.expand_dims(img_cropped, axis=2)
 		#print("shape",img_cropped.shape)
 		
-		self.publish(img_cropped)
+		self.img_pub_ = img_cropped
+
+		#self.publish(img_cropped)
 		#self.show(img_cropped)
 	
 	def show(self,img):
 		#if img.shape[2] != 3:
 		#	img = img[:,:]
-		cv2.imshow('RGB',img)
+		#cv2.imshow('RGB',img)
 		#cv2.imshow('Depth',self.d_slice)
 		cv2.waitKey(1)
 		#cv2.imshow(self.image)
@@ -71,6 +75,12 @@ class Camera_view():
 		img_pub = Image()		
 		self.show(img_cropped)
 		img_pub.data = img_cropped.flatten().tolist()
+		self.publish_img.publish(img_pub)
+
+	def publishMain(self):
+		img_pub = Image()		
+		#self.show(img_cropped)
+		img_pub.data = self.img_pub_.flatten().tolist()
 		self.publish_img.publish(img_pub)
 
 	def savePicture(self, img):		
@@ -85,9 +95,9 @@ class Camera_view():
 def main():
 	cam = Camera_view()
 	rospy.loginfo("cam infos started")
-	rate = rospy.Rate(10)
+	rate = rospy.Rate(5)
 	while not rospy.is_shutdown():
-		#cam.publish()
+		cam.publishMain()
 		rate.sleep()
 
 if __name__ == '__main__':
