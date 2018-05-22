@@ -39,6 +39,11 @@ class MPC():
 		self.goalPoint = [1.0,0.0]
 		self.X0 = np.zeros(6*(self.N+1)) 
 		self.running = False
+		self.timeout_counter = 11
+		self.max_timeout_count = 10
+
+		
+
 
 		#track data 
 		self.tck	#if track is represented as a b_spline its parameter are stored in t, c, k
@@ -140,7 +145,7 @@ class MPC():
 		#init subscriber and publisher
 		self.pubMPCControlVec = rospy.Publisher("/bobcat/mpc_control_vec", MPCControlVec, queue_size=1)
 		rospy.Subscriber("/bobcat/goalPose", Point, self.callback_goal_point)
-
+		rospy.Subscriber("/bobcat/distance", Float64, self.callback_odom)
 
 		# Go to the main loop.
 	 	rate = rospy.Rate(int(1.0/self.dt)) # 10hz    
@@ -178,9 +183,15 @@ class MPC():
 		self.running = True
 		self.tck = data.tck		
 
+	#as soon as better position estimate is available incooperate this instead of distance and speed
+	def callback_distance(self, data):
+		self.distance = data	#this is just a placeholder
+
+	def callback_speed(self, data):
+		self.speed = data	#this is just a placeholder
 
 	#as soon as a vehicle odom is running subscribe to the data and incooperate it
-	def callback_vehicle_parameter(self, data):
+	def callback_odom(self, data):
 		self.odom = data.odom	#this is just a placeholder				
 
 
