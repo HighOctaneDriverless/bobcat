@@ -12,15 +12,18 @@
   <include file="$(find obstacle_detector)/launch/nodes.launch">
     <!--<remap from="pcl" to="/camera/depth/points" />-->
   </include>
+
   <node name="depthimage_to_laserscan" pkg="depthimage_to_laserscan" type="depthimage_to_laserscan" > 
   <remap from="image" to="/camera/depth/image_raw"/>
   <param name="scan_height" value="10" type="int"/>
   <param name="range_max" value="2.0" type="double"/>
   </node>
-
-<node name= "goal_point_calculator" pkg="bobcat_cone_classificator" type="goal_point_calculator.py"/>
-<node name ="camera_view" pkg="bobcat_cone_classificator" type="camera_view.py"/>
-
+  <node name="camera_view" pkg="bobcat_cone_classificator" type="camera_view.py" />
+  <node name="goal_point_calculator" pkg="bobcat_cone_classificator" type="goal_point_calculator.py" />
+  
+  <node name="serial_node" pkg="rosserial_python" type="serial_node.py">
+  <param name="port" value="/dev/ttyUSB0"/>
+  </node>
   <node name="rviz" pkg="rviz" type="rviz" /> 
     
 </launch>

@@ -53,12 +53,12 @@ class Goal_point_calculator():
 		self.computeGoalPoint(left_poles[indx_l], right_poles[indx_r])
 
 	def computeControlValues(self, x ,y):
-		offset = 0.2
+		offset = 0.20
 		y = y + offset
-		p_speed = 3.0
+		p_speed = 0.8
 		p_steer = 1.1
 		dist = math.sqrt(x**2 + y**2)
-		speed = p_speed * dist
+		speed = p_speed
 		steer = p_steer * y
 		self.steer_median.pop(0)
 		self.steer_median.append(steer)
