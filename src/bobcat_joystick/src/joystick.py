@@ -21,7 +21,7 @@ class Ackermann():
     def callback_controller(self,data):
         print data
         self.set_speed(data.axes[1])
-        self.set_steering(data.axes[2])
+        self.set_steering(data.axes[3])
 	self.buttons= data.buttons
         #rospy.loginfo("Joystick speed "+ str(int(self.motor)*100))
 
@@ -40,10 +40,10 @@ class Ackermann():
 		self.speed = 0
         	self.pub_acc.publish(Float64(0))
         ackermannSpeedOut = self.speed # outputting 10m/s max equals 36km/h
-	if abs(self.speed) > 0.1:
+	if abs(self.speed) > 0.05:
         	self.pub_acc.publish(Float64(ackermannSpeedOut))
         ackermannSteerOut = self.steeringAngle * math.pi/6.0
-	if abs(self.steeringAngle) > 0.1:
+	if abs(self.steeringAngle) > 0.05:
         	self.pub_steering.publish(Float64(ackermannSteerOut))
         rospy.loginfo("JoystickSpeed: "+str(round(ackermannSpeedOut, 3))+"   JoystickSteeringAngle: "+str(round(ackermannSteerOut, 3)))
 
