@@ -134,6 +134,7 @@ class Camera_view():
 		b = color[0,0,0]
 		g = color[0,0,1]
 		r = color[0,0,2]
+		print("b:" + str(b)+" ,g: "+str(g)+" r: "+str(r)) 
 		if b > 30 and g < 100 and r < 100:
 			return 1
 		elif b < 30 and g > 50 and r > 100:

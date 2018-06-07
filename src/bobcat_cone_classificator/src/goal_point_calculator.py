@@ -55,7 +55,7 @@ class Goal_point_calculator():
 	def computeControlValues(self, x ,y):
 		offset = 0.20
 		y = y + offset
-		p_speed = 0.8
+		p_speed = 0.4
 		p_steer = 1.1
 		dist = math.sqrt(x**2 + y**2)
 		speed = p_speed
